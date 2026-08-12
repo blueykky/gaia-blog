@@ -7,37 +7,37 @@
    ============================================================ */
 
 const SECTORS = [
-  // 名称, 波动性 x, 强弱势级 y, 甜品度 value, 颜色, 连续性 cont(0-10)
-  { name: "通信",       x: 0.235, y: 0.585, value:  2.47, color: "blue", cont: 8 },
-  { name: "有色金属",   x: 0.230, y: 0.575, value: -0.80, color: "red",  cont: 3 },
-  { name: "公用事业",   x: 0.255, y: 0.580, value: -0.40, color: "blue", cont: 1 },
-  { name: "银行",       x: 0.245, y: 0.560, value:  0.37, color: "blue", cont: 1 },
-  { name: "建筑材料",   x: 0.200, y: 0.560, value:  0.43, color: "red",  cont: 1 },
-  { name: "基础化工",   x: 0.180, y: 0.560, value: -1.10, color: "blue", cont: 4 },
-  { name: "电子设备",   x: 0.175, y: 0.560, value: -1.40, color: "blue", cont: 5 },
-  { name: "机械设备",   x: 0.235, y: 0.555, value: -0.00, color: "blue", cont: 0 },
-  { name: "家用电器",   x: 0.120, y: 0.555, value:  0.04, color: "red",  cont: 0 },
-  { name: "环保",       x: 0.140, y: 0.545, value: -0.90, color: "blue", cont: 3 },
-  { name: "建筑装饰",   x: 0.150, y: 0.510, value: -1.40, color: "blue", cont: 5 },
-  { name: "房地产",     x: 0.160, y: 0.510, value: -0.90, color: "red",  cont: 3 },
-  { name: "交通运输",   x: 0.180, y: 0.510, value: -0.70, color: "blue", cont: 2 },
-  { name: "非银金融",   x: 0.200, y: 0.510, value: -0.30, color: "blue", cont: 1 },
-  { name: "医药生物",   x: 0.245, y: 0.535, value:  0.53, color: "red",  cont: 2 },
-  { name: "煤炭",       x: 0.265, y: 0.530, value:  0.29, color: "blue", cont: 1 },
-  { name: "食品饮料",   x: 0.170, y: 0.495, value: -0.50, color: "blue", cont: 2 },
-  { name: "纺织服饰",   x: 0.120, y: 0.490, value: -0.60, color: "red",  cont: 2 },
-  { name: "轻工制造",   x: 0.105, y: 0.490, value: -1.50, color: "red",  cont: 5 },
-  { name: "石油石化",   x: 0.200, y: 0.480, value: -1.20, color: "blue", cont: 4 },
-  { name: "传媒",       x: 0.180, y: 0.475, value: -1.20, color: "red",  cont: 4 },
-  { name: "国防军工",   x: 0.215, y: 0.480, value: -1.80, color: "blue", cont: 6 },
-  { name: "计算机",     x: 0.160, y: 0.490, value: -1.10, color: "blue", cont: 4 },
-  { name: "汽车",       x: 0.150, y: 0.450, value: -1.40, color: "red",  cont: 5 },
-  { name: "社会服务",   x: 0.160, y: 0.430, value: -1.50, color: "red",  cont: 5 },
-  { name: "美容护理",   x: 0.200, y: 0.455, value: -1.40, color: "blue", cont: 5 },
-  { name: "农林牧渔",   x: 0.200, y: 0.425, value: -1.60, color: "blue", cont: 5 },
-  { name: "商贸零售",   x: 0.135, y: 0.400, value: -1.50, color: "red",  cont: 5 },
-  { name: "钢铁",       x: 0.170, y: 0.410, value: -2.40, color: "blue", cont: 8 },
-  { name: "综合",       x: 0.135, y: 0.305, value: -1.00, color: "blue", cont: 3 }
+  // 名称, 波动性 x, 强弱势级 y, 甜品度 value, 颜色, 连续性 cont(0-10, 1 位小数)
+  { name: "通信",       x: 0.230, y: 0.583, value:  2.47, color: "blue", cont: 8.2 },
+  { name: "有色金属",   x: 0.236, y: 0.575, value: -0.80, color: "red",  cont: 2.7 },
+  { name: "公用事业",   x: 0.255, y: 0.580, value: -0.40, color: "blue", cont: 1.3 },
+  { name: "银行",       x: 0.245, y: 0.560, value:  0.37, color: "blue", cont: 1.2 },
+  { name: "建筑材料",   x: 0.200, y: 0.560, value:  0.43, color: "red",  cont: 1.4 },
+  { name: "基础化工",   x: 0.186, y: 0.560, value: -1.10, color: "blue", cont: 3.7 },
+  { name: "电子设备",   x: 0.173, y: 0.560, value: -1.40, color: "blue", cont: 4.7 },
+  { name: "机械设备",   x: 0.235, y: 0.555, value: -0.00, color: "blue", cont: 0.0 },
+  { name: "家用电器",   x: 0.118, y: 0.555, value:  0.04, color: "red",  cont: 0.1 },
+  { name: "环保",       x: 0.140, y: 0.545, value: -0.90, color: "blue", cont: 3.0 },
+  { name: "建筑装饰",   x: 0.143, y: 0.510, value: -1.40, color: "blue", cont: 4.7 },
+  { name: "房地产",     x: 0.158, y: 0.513, value: -0.90, color: "red",  cont: 3.0 },
+  { name: "交通运输",   x: 0.180, y: 0.510, value: -0.70, color: "blue", cont: 2.3 },
+  { name: "非银金融",   x: 0.200, y: 0.510, value: -0.30, color: "blue", cont: 1.0 },
+  { name: "医药生物",   x: 0.245, y: 0.535, value:  0.53, color: "red",  cont: 1.8 },
+  { name: "煤炭",       x: 0.265, y: 0.530, value:  0.29, color: "blue", cont: 1.0 },
+  { name: "食品饮料",   x: 0.170, y: 0.495, value: -0.50, color: "blue", cont: 1.7 },
+  { name: "纺织服饰",   x: 0.118, y: 0.490, value: -0.60, color: "red",  cont: 2.0 },
+  { name: "轻工制造",   x: 0.105, y: 0.490, value: -1.50, color: "red",  cont: 5.0 },
+  { name: "石油石化",   x: 0.198, y: 0.480, value: -1.20, color: "blue", cont: 4.0 },
+  { name: "传媒",       x: 0.180, y: 0.475, value: -1.20, color: "red",  cont: 4.0 },
+  { name: "国防军工",   x: 0.218, y: 0.480, value: -1.80, color: "blue", cont: 6.0 },
+  { name: "计算机",     x: 0.160, y: 0.490, value: -1.10, color: "blue", cont: 3.7 },
+  { name: "汽车",       x: 0.150, y: 0.450, value: -1.40, color: "red",  cont: 4.7 },
+  { name: "社会服务",   x: 0.160, y: 0.430, value: -1.50, color: "red",  cont: 5.0 },
+  { name: "美容护理",   x: 0.200, y: 0.455, value: -1.40, color: "blue", cont: 4.7 },
+  { name: "农林牧渔",   x: 0.202, y: 0.425, value: -1.60, color: "blue", cont: 5.3 },
+  { name: "商贸零售",   x: 0.135, y: 0.400, value: -1.50, color: "red",  cont: 5.0 },
+  { name: "钢铁",       x: 0.170, y: 0.410, value: -2.40, color: "blue", cont: 8.0 },
+  { name: "综合",       x: 0.135, y: 0.305, value: -1.00, color: "blue", cont: 3.3 }
 ];
 
 // 视图配置
@@ -237,7 +237,7 @@ function onHover(d, el, e) {
     '<div class="tt-name">' + d.name + '</div>' +
     '<div class="tt-row"><span>波动性</span><b>' + d.x.toFixed(3) + '</b></div>' +
     '<div class="tt-row"><span>强弱势级</span><b>' + d.y.toFixed(3) + '</b></div>' +
-    '<div class="tt-row"><span>连续性</span><b>' + d.cont + '</b></div>' +
+    '<div class="tt-row"><span>连续性</span><b>' + d.cont.toFixed(1) + '</b></div>' +
     '<div class="tt-row"><span>甜品度</span><b>' + d.value.toFixed(2) + '</b></div>';
   tooltip.classList.add("show");
   moveTooltip(e);
@@ -383,7 +383,7 @@ createFilterControl("df-x", "df-x-values", 0.08, 0.28, state.xLo, state.xHi, (lo
 
 createFilterControl("df-c", "df-c-values", 0, 10, state.cLo, state.cHi, (lo, hi) => {
   state.cLo = lo; state.cHi = hi; applyFilter();
-}, 1);
+}, 0.1);
 
 createFilterControl("df-v", "df-v-values", -2.50, 2.50, state.vLo, state.vHi, (lo, hi) => {
   state.vLo = lo; state.vHi = hi; applyFilter();
