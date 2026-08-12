@@ -7,7 +7,7 @@
   <meta name="description" content="2026-08-11 申万一级行业强弱分布交互图：波动性 × 强弱势级，鼠标悬停观察细节。" />
   <meta name="theme-color" content="#FFFFFF">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/interactive.css?v=9">
+  <link rel="stylesheet" href="css/interactive.css?v=10">
 </head>
 <body>
 
@@ -35,7 +35,12 @@
       <div class="interactive-wrap">
 
         <div class="controls">
-          <div class="date-seg" id="date-seg" role="group" aria-label="日期选择"></div>
+          <div class="datepicker-wrap" id="datepicker-wrap">
+            <button type="button" class="date-picker-btn" id="date-picker-btn" aria-haspopup="dialog">
+              <span id="date-picker-label">2026-08-11</span><span class="dp-caret">▾</span>
+            </button>
+            <div class="datepicker-pop" id="datepicker-pop" role="dialog" aria-label="选择日期" hidden></div>
+          </div>
           <div class="dualfilter">
             <span>强弱</span>
             <div class="df-track" id="df-y"></div>
@@ -73,7 +78,7 @@
           <div id="tooltip" class="tooltip" role="tooltip"></div>
         </div>
 
-        <p class="caption">31 个申万一级行业 · 数字=甜品度 · 圆大小=连续性(0-10) · 切换日期查看不同交易日截面 · 轴范围随数据库动态调整</p>
+        <p class="caption">31 个申万一级行业 · 数字=甜品度 · 圆大小=连续性(0-10) · 日历选择日期查看不同交易日截面 · 轴范围随数据库动态调整</p>
       </div>
 
     </article>
@@ -86,7 +91,7 @@
     </div>
   </footer>
 
-  <script src="js/sector-data.js?v=9"></script>
-  <script src="js/sector-strength.js?v=9"></script>
+  <script src="js/sector-data.js?v=10"></script>
+  <script src="js/sector-strength.js?v=10"></script>
 </body>
 </html>

@@ -461,25 +461,89 @@ document.querySelectorAll(".seg-btn").forEach(btn => {
   });
 });
 
-// ---------- 日期切换：动态生成按钮 ----------
-function buildDateButtons() {
-  const dateSeg = $("date-seg");
-  if (!dateSeg) return;
-  dateSeg.innerHTML = "";
-  AVAILABLE_DATES.forEach(date => {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "date-btn";
-    btn.dataset.date = date;
-    btn.textContent = date.substring(5); // "08-11"
-    if (date === currentDate) btn.classList.add("active");
-    btn.addEventListener("click", () => {
-      if (btn.dataset.date === currentDate) return;
-      dateSeg.querySelectorAll(".date-btn").forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-      switchDate(btn.dataset.date);
-    });
-    dateSeg.appendChild(btn);
+// ---------- 日历日期选择 ----------
+const dpWrap = $("datepicker-wrap");
+const dpBtn = $("date-picker-btn");
+const dpPop = $("datepicker-pop");
+const dpLabel = $("date-picker-label");
+const dataDates = new Set(Object.keys(DB.dates));
+let calView = { y: 0, m: 0 };
+
+const pad2 = (n) => (n < 10 ? "0" : "") + n;
+
+function buildCalendar(y, m) {
+  calView = { y, m };
+  const first = new Date(y, m - 1, 1);
+  const startDow = (first.getDay() + 6) % 7; // 周一=0
+  const daysInMonth = new Date(y, m, 0).getDate();
+
+  let html =
+    '<div class="dp-head">' +
+    '<button type="button" class="dp-nav" data-dir="-1" aria-label="上个月">‹</button>' +
+    '<span class="dp-title">' + y + ' 年 ' + m + ' 月</span>' +
+    '<button type="button" class="dp-nav" data-dir="1" aria-label="下个月">›</button>' +
+    '</div>' +
+    '<div class="dp-dow-row"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>' +
+    '<div class="dp-grid">';
+
+  for (let i = 0; i < startDow; i++) html += '<span class="dp-blank"></span>';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = y + "-" + pad2(m) + "-" + pad2(d);
+    const hasData = dataDates.has(dateStr);
+    const isCur = dateStr === currentDate;
+    html +=
+      '<button type="button" class="dp-day' +
+      (hasData ? " has-data" : "") +
+      (isCur ? " selected" : "") +
+      '" data-date="' + dateStr + '"' +
+      (hasData ? "" : " disabled") +
+      '>' + d + '</button>';
+  }
+  html += "</div>";
+  dpPop.innerHTML = html;
+}
+
+function openCalendar() {
+  const parts = currentDate.split("-");
+  buildCalendar(parseInt(parts[0], 10), parseInt(parts[1], 10));
+  dpPop.hidden = false;
+}
+
+function closeCalendar() {
+  dpPop.hidden = true;
+}
+
+if (dpBtn && dpPop) {
+  dpBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (dpPop.hidden) openCalendar();
+    else closeCalendar();
+  });
+
+  // 日历内部交互（事件委托）
+  dpPop.addEventListener("click", (e) => {
+    const nav = e.target.closest(".dp-nav");
+    if (nav) {
+      let { y, m } = calView;
+      m += parseInt(nav.dataset.dir, 10);
+      if (m < 1) { m = 12; y--; }
+      if (m > 12) { m = 1; y++; }
+      buildCalendar(y, m);
+      return;
+    }
+    const day = e.target.closest(".dp-day");
+    if (day && day.dataset.date && !day.disabled) {
+      switchDate(day.dataset.date);
+      if (dpLabel) dpLabel.textContent = currentDate;
+      closeCalendar();
+    }
+  });
+
+  // 点击外部关闭
+  document.addEventListener("click", (e) => {
+    if (!dpPop.hidden && dpWrap && !dpWrap.contains(e.target)) {
+      closeCalendar();
+    }
   });
 }
 
@@ -499,7 +563,7 @@ const btnReplay = $("btn-replay");
 if (btnReplay) btnReplay.addEventListener("click", playEnter);
 
 // ---------- 启动 ----------
-buildDateButtons();
+if (dpLabel) dpLabel.textContent = currentDate;
 renderAxes(currentDate);
 renderDots(currentSectors);
 avoidOverlap();
