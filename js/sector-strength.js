@@ -564,8 +564,8 @@ if (dpBtn && dpPop) {
       buildCalendar(calView.y, parseInt(month.dataset.month, 10), "days");
       return;
     }
-    // 年份快选（years 视图点击年份 → 切 months 视图）
-    const year = e.target.closest("[data-nav='pick-m']");
+    // 年份快选（years 视图点击年份按钮 → 切 months 视图）
+    const year = e.target.closest(".dp-year");
     if (year) {
       buildCalendar(parseInt(year.dataset.year, 10), 1, "months");
       return;
