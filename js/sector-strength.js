@@ -332,12 +332,52 @@ function createDualRange(trackEl, valEl, min, max, lo, hi, onChange) {
   };
 }
 
-// ---------- 控件绑定 ----------
-const dfY = createDualRange($("df-y"), $("df-y-values"), 0.30, 0.65, state.yLo, state.yHi, (lo, hi) => {
+// ---------- 控件兼容层：v3 (df-y) 和 v2 (filter-y) 都能用 ----------
+function createFilterControl(trackId, valId, min, max, lo, hi, onChange) {
+  const trackEl = $(trackId);
+  const valEl = $(valId);
+  if (!trackEl) return null;
+
+  // v3 风格：<div class="df-track"> → 双端滑块
+  if (trackEl.tagName === "DIV") {
+    return createDualRange(trackEl, valEl, min, max, lo, hi, onChange);
+  }
+
+  // v2 风格：<input type="range"> → 降级为单滑块（lo=输入值, hi=最大值）
+  if (trackEl.tagName === "INPUT") {
+    trackEl.value = lo;
+    const emit = () => {
+      const v = parseFloat(trackEl.value);
+      if (valEl) valEl.textContent = "≥ " + v.toFixed(2);
+      onChange(v, max);
+    };
+    trackEl.addEventListener("input", emit);
+    if (valEl) valEl.textContent = "≥ " + lo.toFixed(2);
+    return {
+      set: (l, h) => { trackEl.value = l; emit(); },
+      get: () => ({ lo: parseFloat(trackEl.value), hi: max })
+    };
+  }
+  return null;
+}
+
+// ---------- 控件绑定（兼容不同 HTML 版本） ----------
+const yCtrl = createFilterControl("df-y", "df-y-values", 0.30, 0.65, state.yLo, state.yHi, (lo, hi) => {
   state.yLo = lo; state.yHi = hi;
   applyFilter();
 });
-const dfX = createDualRange($("df-x"), $("df-x-values"), 0.08, 0.28, state.xLo, state.xHi, (lo, hi) => {
+if (!yCtrl) {
+  // 尝试 v2 元素名
+  createFilterControl("filter-y", "filter-y-value", 0.30, 0.65, state.yLo, state.yHi, (lo, hi) => {
+    state.yLo = lo; state.yHi = hi;
+    applyFilter();
+  });
+}
+
+createFilterControl("df-x", "df-x-values", 0.08, 0.28, state.xLo, state.xHi, (lo, hi) => {
+  state.xLo = lo; state.xHi = hi;
+  applyFilter();
+}) || createFilterControl("filter-x", "filter-x-value", 0.08, 0.28, state.xLo, state.xHi, (lo, hi) => {
   state.xLo = lo; state.xHi = hi;
   applyFilter();
 });
