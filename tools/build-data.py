@@ -4,10 +4,14 @@
 行业强弱数据库 → 页面数据生成脚本
 从 data/sector-db.json 生成 js/sector-data.js（页面引用）
 
-用法: python tools/build-data.py
-校验: 每个日期必须包含 industries 中全部 31 个行业，缺失会报错（STRICT）
+数据模型（v3）：
+- industries: 31 个行业名列表（顺序固定）
+- dates: {date: [sector objects]}, 每个 sector 含 name + x + y + value + color + cont
+- 坐标按各日期图中实际位置记录（不同日期同一行业坐标可能略不同）
+
+校验：每个日期数组必须包含 industries 中全部 31 个行业，且每个对象必须含 x/y/value/color/cont
 """
-import json, os, sys, datetime
+import json, os, sys
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DB_PATH = os.path.join(BASE, "data", "sector-db.json")
@@ -19,29 +23,37 @@ def main():
 
     industries = db["industries"]
     dates = db["dates"]
-    ind_names = [ind["name"] for ind in industries]
+    if len(industries) != 31:
+        print(f"!! 行业数={len(industries)}（应该 31）")
+        sys.exit(1)
 
-    # ---- 校验：每个日期行业必须齐全 + cont 必须存在 ----
+    # ---- 校验：每个日期数组齐全 + 要素完整 ----
     errors = []
-    for date, data in dates.items():
-        missing = [n for n in ind_names if n not in data or data[n] is None]
+    for date, arr in dates.items():
+        if not isinstance(arr, list):
+            errors.append(f"{date} 不是数组")
+            continue
+        names = [s.get("name") for s in arr]
+        missing = [n for n in industries if n not in names]
         if missing:
-            errors.append(f"{date} 缺失行业: {', '.join(missing)}")
-        for name, d in data.items():
-            if d is None:
-                continue
-            if "value" not in d:
-                errors.append(f"{date} {name} 缺 value")
-            if "color" not in d:
-                errors.append(f"{date} {name} 缺 color")
-            if "cont" not in d:
-                errors.append(f"{date} {name} 缺 cont（连续性）")
+            errors.append(f"{date} 缺行业: {', '.join(missing)}")
+        for s in arr:
+            for k in ("x", "y", "value", "color", "cont"):
+                if k not in s:
+                    errors.append(f"{date} {s.get('name', '?')} 缺 {k}")
 
     if errors:
         print("!! 数据完整性校验失败（未生成 js/sector-data.js）:")
         for e in errors:
             print("   -", e)
         sys.exit(1)
+
+    # ---- 自动补 cont（如有缺失）----
+    for date, arr in dates.items():
+        for s in arr:
+            if "cont" not in s:
+                v = abs(s.get("value", 0))
+                s["cont"] = round(min(v, 3) * 10 / 3 * 10) / 10
 
     # ---- 生成 JS ----
     js = (

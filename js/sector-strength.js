@@ -16,24 +16,19 @@ const REF_X = 0.21;  // 波动性分界
 
 // ---------- 从 SECTOR_DB 计算动态范围 ----------
 function computeRanges(db) {
-  const indMap = {};
-  db.industries.forEach(ind => indMap[ind.name] = ind);
-
   let xMin = Infinity, xMax = -Infinity;
   let yMin = Infinity, yMax = -Infinity;
   let vMin = Infinity, vMax = -Infinity;
 
-  Object.values(db.dates).forEach(dateData => {
-    Object.entries(dateData).forEach(([name, d]) => {
-      if (!d) return;
-      const ind = indMap[name];
-      if (!ind) return;
-      xMin = Math.min(xMin, ind.x);
-      xMax = Math.max(xMax, ind.x);
-      yMin = Math.min(yMin, ind.y);
-      yMax = Math.max(yMax, ind.y);
-      vMin = Math.min(vMin, d.value);
-      vMax = Math.max(vMax, d.value);
+  Object.values(db.dates).forEach(arr => {
+    arr.forEach(s => {
+      if (!s) return;
+      xMin = Math.min(xMin, s.x);
+      xMax = Math.max(xMax, s.x);
+      yMin = Math.min(yMin, s.y);
+      yMax = Math.max(yMax, s.y);
+      vMin = Math.min(vMin, s.value);
+      vMax = Math.max(vMax, s.value);
     });
   });
 
@@ -71,22 +66,9 @@ function niceTicks(min, max, count) {
 
 function rScale(v) { return 8 + Math.min(Math.abs(v), 3) * 4.5; }
 
-// ---------- 构建 sectors（固定行业集合，按日期填充；cont 直接取数据库值） ----------
+// ---------- 构建 sectors（直接取数据库中该日期的数组，每条数据带完整坐标） ----------
 function buildSectors(date, db) {
-  return db.industries.map(ind => {
-    const d = db.dates[date][ind.name];
-    const value = d ? d.value : 0;
-    const color = d ? d.color : "blue";
-    const cont = d && typeof d.cont === "number" ? d.cont : 0;
-    return {
-      name: ind.name,
-      x: ind.x,
-      y: ind.y,
-      value,
-      color,
-      cont
-    };
-  });
+  return db.dates[date] || [];
 }
 
 // ---------- 主逻辑 ----------
