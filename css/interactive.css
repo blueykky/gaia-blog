@@ -52,6 +52,68 @@
   border-color: var(--ink);
 }
 
+/* ---- 双端范围滑块 ---- */
+.dualfilter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-soft);
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.df-track {
+  position: relative;
+  width: 150px;
+  height: 20px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.df-rail {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--hairline);
+}
+
+.df-range {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+
+.df-thumb {
+  position: absolute;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1.5px solid var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  transform: translateX(-50%);
+  cursor: grab;
+  transition: box-shadow .15s ease;
+}
+
+.df-thumb:hover { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18); }
+.df-thumb:active { cursor: grabbing; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22); }
+
+.df-values {
+  min-width: 96px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  font-size: 13px;
+}
+
 .ctrl-range {
   display: flex;
   align-items: center;

@@ -7,7 +7,7 @@
   <meta name="description" content="2026-08-11 申万一级行业强弱分布交互图：波动性 × 强弱势级，鼠标悬停观察细节。" />
   <meta name="theme-color" content="#FFFFFF">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/interactive.css">
+  <link rel="stylesheet" href="css/interactive.css?v=3">
 </head>
 <body>
 
@@ -35,16 +35,16 @@
       <div class="interactive-wrap">
 
         <div class="controls">
-          <label class="ctrl-range">
-            <span>强弱过滤</span>
-            <input type="range" id="filter-y" min="0.30" max="0.65" step="0.01" value="0.30">
-            <span id="filter-y-value">≥ 0.30</span>
-          </label>
-          <label class="ctrl-range">
-            <span>波动性过滤</span>
-            <input type="range" id="filter-x" min="0.08" max="0.28" step="0.01" value="0.08">
-            <span id="filter-x-value">≥ 0.08</span>
-          </label>
+          <div class="dualfilter">
+            <span>强弱</span>
+            <div class="df-track" id="df-y" role="slider" aria-label="强弱范围筛选" aria-valuemin="0.30" aria-valuemax="0.65" aria-valuenow="0.30" aria-valuetext="0.30 到 0.65"></div>
+            <span class="df-values" id="df-y-values">0.30 – 0.65</span>
+          </div>
+          <div class="dualfilter">
+            <span>波动性</span>
+            <div class="df-track" id="df-x" role="slider" aria-label="波动性范围筛选" aria-valuemin="0.08" aria-valuemax="0.28" aria-valuenow="0.08" aria-valuetext="0.08 到 0.28"></div>
+            <span class="df-values" id="df-x-values">0.08 – 0.28</span>
+          </div>
           <button id="btn-replay" class="ctrl-btn" type="button">▶ 重播动画</button>
           <span id="dot-count" class="count-tag"></span>
         </div>
@@ -54,7 +54,7 @@
           <div id="tooltip" class="tooltip" role="tooltip"></div>
         </div>
 
-        <p class="caption">30 个申万一级行业 · 圆点大小代表涨跌幅绝对值 · 双滑块筛选：强弱 × 波动性</p>
+        <p class="caption">30 个申万一级行业 · 圆点大小代表涨跌幅绝对值 · 双端滑块选范围：强弱 × 波动性</p>
       </div>
 
     </article>
@@ -67,6 +67,6 @@
     </div>
   </footer>
 
-  <script src="js/sector-strength.js"></script>
+  <script src="js/sector-strength.js?v=3"></script>
 </body>
 </html>

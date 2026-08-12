@@ -1,7 +1,7 @@
 /* ============================================================
-   行业强弱分布 — 交互逻辑（v2）
+   行业强弱分布 — 交互逻辑（v3）
    30 个申万一级行业（2026-08-11）
-   散点图：波动性 x × 强弱势级 y；强弱/波动性双过滤；标签防重叠
+   散点图：波动性 x × 强弱势级 y；强弱/波动性【范围】双端滑块筛选；标签防重叠
    ============================================================ */
 
 const SECTORS = [
@@ -48,12 +48,24 @@ const COLOR = {
   red:  "#DC5F5F"
 };
 
-// 状态
+// 状态：范围过滤（lo–hi 闭区间）
 let state = {
-  filterY: 0.30,   // 强弱过滤阈值（y）
-  filterX: 0.08,   // 波动性过滤阈值（x）
+  yLo: 0.30, yHi: 0.65,
+  xLo: 0.08, xHi: 0.28,
   current: null
 };
+
+// ---------- 安全取元素：缺任何关键元素都不抛错 ----------
+function $(id) { return document.getElementById(id); }
+const svg = $("chart");
+const tooltip = $("tooltip");
+const countEl = $("dot-count");
+
+if (!svg || !tooltip) {
+  // 关键容器缺失：静默退出，避免白屏/报错
+} else {
+
+const dots = [];
 
 // 比例尺
 const xScale = (x) => {
@@ -65,12 +77,6 @@ const yScale = (y) => {
   return VIEW.pad.top + (Y_RANGE[1] - y) / (Y_RANGE[1] - Y_RANGE[0]) * innerH;
 };
 const rScale = (v) => 8 + Math.min(Math.abs(v), 3) * 4.5;
-
-// 渲染容器
-const svg = document.getElementById("chart");
-const tooltip = document.getElementById("tooltip");
-const countEl = document.getElementById("dot-count");
-let dots = [];
 
 function svgEl(name, attrs, parent) {
   const el = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -87,52 +93,22 @@ function renderAxes() {
   const innerW = VIEW.w - VIEW.pad.left - VIEW.pad.right;
   const innerH = VIEW.h - VIEW.pad.top - VIEW.pad.bottom;
 
-  // 横向虚线 y=0.50（强弱分界）
   const yMid = yScale(0.50);
-  svgEl("line", {
-    x1: VIEW.pad.left, y1: yMid, x2: VIEW.pad.left + innerW, y2: yMid,
-    class: "axis-line"
-  }, svg);
+  svgEl("line", { x1: VIEW.pad.left, y1: yMid, x2: VIEW.pad.left + innerW, y2: yMid, class: "axis-line" }, svg);
 
-  // 纵向虚线 x=0.21（波动性参考）
   const xMid = xScale(0.21);
-  svgEl("line", {
-    x1: xMid, y1: VIEW.pad.top, x2: xMid, y2: VIEW.pad.top + innerH,
-    class: "axis-line"
-  }, svg);
+  svgEl("line", { x1: xMid, y1: VIEW.pad.top, x2: xMid, y2: VIEW.pad.top + innerH, class: "axis-line" }, svg);
 
-  // x 轴刻度
   [0.08, 0.13, 0.18, 0.23, 0.28].forEach(v => {
-    svgEl("text", {
-      x: xScale(v), y: VIEW.pad.top + innerH + 24,
-      "text-anchor": "middle", class: "axis-label", text: v.toFixed(2)
-    }, svg);
+    svgEl("text", { x: xScale(v), y: VIEW.pad.top + innerH + 24, "text-anchor": "middle", class: "axis-label", text: v.toFixed(2) }, svg);
   });
-
-  // y 轴刻度
   [0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65].forEach(v => {
-    svgEl("text", {
-      x: VIEW.pad.left - 12, y: yScale(v) + 4,
-      "text-anchor": "end", class: "axis-label", text: v.toFixed(2)
-    }, svg);
+    svgEl("text", { x: VIEW.pad.left - 12, y: yScale(v) + 4, "text-anchor": "end", class: "axis-label", text: v.toFixed(2) }, svg);
   });
 
-  // 轴标题
-  svgEl("text", {
-    x: VIEW.pad.left + innerW / 2, y: VIEW.h - 18,
-    "text-anchor": "middle", class: "axis-title", text: "波动性"
-  }, svg);
-  svgEl("text", {
-    x: 18, y: VIEW.pad.top + innerH / 2,
-    transform: "rotate(-90 18 " + (VIEW.pad.top + innerH / 2) + ")",
-    "text-anchor": "middle", class: "axis-title", text: "强弱势级"
-  }, svg);
-
-  // 日期标签
-  svgEl("text", {
-    x: VIEW.w - VIEW.pad.right, y: VIEW.pad.top - 16,
-    "text-anchor": "end", class: "date-tag", text: "2026.08.11"
-  }, svg);
+  svgEl("text", { x: VIEW.pad.left + innerW / 2, y: VIEW.h - 18, "text-anchor": "middle", class: "axis-title", text: "波动性" }, svg);
+  svgEl("text", { x: 18, y: VIEW.pad.top + innerH / 2, transform: "rotate(-90 18 " + (VIEW.pad.top + innerH / 2) + ")", "text-anchor": "middle", class: "axis-title", text: "强弱势级" }, svg);
+  svgEl("text", { x: VIEW.w - VIEW.pad.right, y: VIEW.pad.top - 16, "text-anchor": "end", class: "date-tag", text: "2026.08.11" }, svg);
 }
 
 // ---------- 圆点 ----------
@@ -143,7 +119,6 @@ function renderDots() {
     const r = rScale(d.value);
 
     const g = svgEl("g", { class: "dot", "data-name": d.name }, svg);
-
     const circle = svgEl("circle", {
       cx, cy, r,
       fill: d.color === "blue" ? COLOR.blue : COLOR.red,
@@ -151,7 +126,6 @@ function renderDots() {
       stroke: "rgba(255,255,255,0.6)",
       "stroke-width": "0.8"
     }, g);
-
     const label = svgEl("text", {
       x: cx + r + 4, y: cy + 4,
       class: "dot-label", text: d.name + " " + d.value.toFixed(2)
@@ -182,7 +156,7 @@ function avoidOverlap() {
     const bb = lab.getBBox();
     const bw = bb.width, bh = bb.height;
     const rightEdge = VIEW.w - VIEW.pad.right;
-    if (lx + bw > rightEdge) lx = item.cx - item.r - 4 - bw; // 太靠右则放左边
+    if (lx + bw > rightEdge) lx = item.cx - item.r - 4 - bw;
     const baseY = item.cy - bh / 2;
 
     let found = null;
@@ -205,18 +179,20 @@ function avoidOverlap() {
   }
 }
 
-// ---------- 过滤（强弱 y + 波动性 x 双条件） ----------
+// ---------- 范围过滤（闭区间：lo ≤ v ≤ hi） ----------
 function applyFilter() {
   let visible = 0;
   dots.forEach(item => {
-    const show = item.d.y >= state.filterY && item.d.x >= state.filterX;
+    const d = item.d;
+    const show = d.y >= state.yLo && d.y <= state.yHi &&
+                 d.x >= state.xLo && d.x <= state.xHi;
     item.g.classList.toggle("faded", !show);
     if (show) visible++;
   });
-  countEl.textContent = "显示 " + visible + " / " + SECTORS.length + " 个行业";
+  if (countEl) countEl.textContent = "显示 " + visible + " / " + SECTORS.length + " 个行业";
 }
 
-// ---------- 入场动画：从中心散开 ----------
+// ---------- 入场动画 ----------
 function playEnter() {
   const cx0 = VIEW.w / 2, cy0 = VIEW.h / 2;
   dots.forEach((item, i) => {
@@ -242,9 +218,7 @@ function playEnter() {
 
 // ---------- hover / tooltip ----------
 function onHover(d, el, e) {
-  dots.forEach(o => {
-    if (o.g !== el) o.g.classList.add("faded");
-  });
+  dots.forEach(o => { if (o.g !== el) o.g.classList.add("faded"); });
   el.classList.add("active");
   el.classList.remove("faded");
   state.current = d;
@@ -281,25 +255,95 @@ function moveTooltip(e) {
   tooltip.style.top = (e.clientY - area.top) + "px";
 }
 
-// ---------- 控件 ----------
-const rangeY = document.getElementById("filter-y");
-const rangeYValue = document.getElementById("filter-y-value");
-const rangeX = document.getElementById("filter-x");
-const rangeXValue = document.getElementById("filter-x-value");
+// ---------- 双端范围滑块组件 ----------
+function createDualRange(trackEl, valEl, min, max, lo, hi, onChange) {
+  if (!trackEl) return null;
+  const rail = document.createElement("div");
+  rail.className = "df-rail";
+  const rng = document.createElement("div");
+  rng.className = "df-range";
+  const t1 = document.createElement("div");
+  t1.className = "df-thumb";
+  const t2 = document.createElement("div");
+  t2.className = "df-thumb";
+  trackEl.appendChild(rail);
+  trackEl.appendChild(rng);
+  trackEl.appendChild(t1);
+  trackEl.appendChild(t2);
 
-rangeY.addEventListener("input", () => {
-  state.filterY = parseFloat(rangeY.value);
-  rangeYValue.textContent = "≥ " + state.filterY.toFixed(2);
+  const span = max - min;
+  const round2 = (v) => Math.round(v * 100) / 100;
+  let active = 0; // 0=无, 1=左, 2=右
+
+  const pct = (v) => (v - min) / span * 100;
+  const valFromX = (px) => {
+    const rect = trackEl.getBoundingClientRect();
+    const ratio = Math.min(1, Math.max(0, (px - rect.left) / rect.width));
+    return min + ratio * span;
+  };
+
+  function paint() {
+    t1.style.left = pct(lo) + "%";
+    t2.style.left = pct(hi) + "%";
+    rng.style.left = pct(lo) + "%";
+    rng.style.width = Math.max(0, pct(hi) - pct(lo)) + "%";
+    if (valEl) valEl.textContent = round2(lo).toFixed(2) + " – " + round2(hi).toFixed(2);
+  }
+
+  function moveTo(px) {
+    let v = round2(valFromX(px));
+    if (active === 1) {
+      lo = Math.min(v, round2(hi - 0.01));
+    } else if (active === 2) {
+      hi = Math.max(v, round2(lo + 0.01));
+    }
+    paint();
+    onChange(round2(lo), round2(hi));
+  }
+
+  function pick(px) {
+    const v = valFromX(px);
+    const d1 = Math.abs(v - lo), d2 = Math.abs(v - hi);
+    active = d1 <= d2 ? 1 : 2;
+  }
+
+  function onDown(e) {
+    e.preventDefault();
+    pick(e.clientX);
+    moveTo(e.clientX);
+    try { trackEl.setPointerCapture(e.pointerId); } catch (err) {}
+    trackEl.addEventListener("pointermove", onMove);
+    trackEl.addEventListener("pointerup", onUp);
+    trackEl.addEventListener("pointercancel", onUp);
+  }
+  function onMove(e) { moveTo(e.clientX); }
+  function onUp(e) {
+    active = 0;
+    trackEl.removeEventListener("pointermove", onMove);
+    trackEl.removeEventListener("pointerup", onUp);
+    trackEl.removeEventListener("pointercancel", onUp);
+  }
+
+  trackEl.addEventListener("pointerdown", onDown);
+  paint();
+  return {
+    set: (l, h) => { lo = l; hi = h; paint(); onChange(l, h); },
+    get: () => ({ lo: round2(lo), hi: round2(hi) })
+  };
+}
+
+// ---------- 控件绑定 ----------
+const dfY = createDualRange($("df-y"), $("df-y-values"), 0.30, 0.65, state.yLo, state.yHi, (lo, hi) => {
+  state.yLo = lo; state.yHi = hi;
   applyFilter();
 });
-rangeX.addEventListener("input", () => {
-  state.filterX = parseFloat(rangeX.value);
-  rangeXValue.textContent = "≥ " + rangeX.value.toFixed(2);
+const dfX = createDualRange($("df-x"), $("df-x-values"), 0.08, 0.28, state.xLo, state.xHi, (lo, hi) => {
+  state.xLo = lo; state.xHi = hi;
   applyFilter();
 });
 
-const btnReplay = document.getElementById("btn-replay");
-btnReplay.addEventListener("click", playEnter);
+const btnReplay = $("btn-replay");
+if (btnReplay) btnReplay.addEventListener("click", playEnter);
 
 // ---------- 启动 ----------
 renderAxes();
@@ -307,3 +351,5 @@ renderDots();
 avoidOverlap();
 applyFilter();
 setTimeout(playEnter, 100);
+
+} // end of safe-guard block
