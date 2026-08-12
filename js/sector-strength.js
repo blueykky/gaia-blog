@@ -443,27 +443,35 @@ document.querySelectorAll(".seg-btn").forEach(btn => {
   });
 });
 
-// ---------- 日历日期选择 ----------
+// ---------- 日历日期选择（三视图：days / months / years） ----------
 const dpWrap = $("datepicker-wrap");
 const dpBtn = $("date-picker-btn");
 const dpPop = $("datepicker-pop");
 const dpLabel = $("date-picker-label");
 const dataDates = new Set(Object.keys(DB.dates));
-let calView = { y: 0, m: 0 };
+let calView = { y: 2026, m: 8 };
+let viewMode = "days"; // "days" | "months" | "years"
 
 const pad2 = (n) => (n < 10 ? "0" : "") + n;
 
-function buildCalendar(y, m) {
+function buildCalendar(y, m, mode) {
   calView = { y, m };
+  viewMode = mode || viewMode;
+  if (viewMode === "days") buildDaysView(y, m);
+  else if (viewMode === "months") buildMonthsView(y);
+  else buildYearsView(y);
+}
+
+function buildDaysView(y, m) {
   const first = new Date(y, m - 1, 1);
-  const startDow = (first.getDay() + 6) % 7; // 周一=0
+  const startDow = (first.getDay() + 6) % 7;
   const daysInMonth = new Date(y, m, 0).getDate();
 
   let html =
     '<div class="dp-head">' +
-    '<button type="button" class="dp-nav" data-dir="-1" aria-label="上个月">‹</button>' +
-    '<span class="dp-title">' + y + ' 年 ' + m + ' 月</span>' +
-    '<button type="button" class="dp-nav" data-dir="1" aria-label="下个月">›</button>' +
+    '<button type="button" class="dp-nav" data-nav="prev-m" aria-label="上个月">‹</button>' +
+    '<button type="button" class="dp-title-btn" data-nav="pick-m" aria-label="选择月份">' + y + ' 年 ' + m + ' 月 ▾</button>' +
+    '<button type="button" class="dp-nav" data-nav="next-m" aria-label="下个月">›</button>' +
     '</div>' +
     '<div class="dp-dow-row"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>' +
     '<div class="dp-grid">';
@@ -485,9 +493,55 @@ function buildCalendar(y, m) {
   dpPop.innerHTML = html;
 }
 
+function buildMonthsView(y) {
+  // 检查哪几个月有数据
+  const monthHasData = {};
+  dataDates.forEach(d => {
+    const parts = d.split("-");
+    if (parseInt(parts[0], 10) === y) monthHasData[parseInt(parts[1], 10)] = true;
+  });
+
+  let html =
+    '<div class="dp-head">' +
+    '<button type="button" class="dp-nav" data-nav="prev-y" aria-label="上一年">‹</button>' +
+    '<button type="button" class="dp-title-btn" data-nav="pick-y" aria-label="选择年份">' + y + ' 年 ▾</button>' +
+    '<button type="button" class="dp-nav" data-nav="next-y" aria-label="下一年">›</button>' +
+    '</div>' +
+    '<div class="dp-months">';
+  for (let m = 1; m <= 12; m++) {
+    const has = monthHasData[m];
+    html +=
+      '<button type="button" class="dp-month' + (has ? " has-data" : "") + '" data-nav="pick-d" data-month="' + m + '"' + (has ? "" : " disabled") + '>' +
+      m + '月' + (has ? ' <span class="dp-dot"></span>' : '') + '</button>';
+  }
+  html += "</div>";
+  dpPop.innerHTML = html;
+}
+
+function buildYearsView(y) {
+  // 显示以 y 为中心前后 6 年共 12 年
+  const startY = y - 5;
+  const endY = y + 6;
+  let html =
+    '<div class="dp-head">' +
+    '<button type="button" class="dp-nav" data-nav="prev-12y" aria-label="上 12 年">‹</button>' +
+    '<button type="button" class="dp-title-btn" data-nav="back" aria-label="返回">' + startY + ' – ' + endY + '</button>' +
+    '<button type="button" class="dp-nav" data-nav="next-12y" aria-label="下 12 年">›</button>' +
+    '</div>' +
+    '<div class="dp-years">';
+  for (let yr = startY; yr <= endY; yr++) {
+    const hasYear = Array.from(dataDates).some(d => d.startsWith(yr + "-"));
+    html +=
+      '<button type="button" class="dp-year' + (hasYear ? " has-data" : "") + '" data-nav="pick-m" data-year="' + yr + '">' +
+      yr + (hasYear ? ' <span class="dp-dot"></span>' : '') + '</button>';
+  }
+  html += "</div>";
+  dpPop.innerHTML = html;
+}
+
 function openCalendar() {
   const parts = currentDate.split("-");
-  buildCalendar(parseInt(parts[0], 10), parseInt(parts[1], 10));
+  buildCalendar(parseInt(parts[0], 10), parseInt(parts[1], 10), "days");
   dpPop.hidden = false;
 }
 
@@ -504,15 +558,41 @@ if (dpBtn && dpPop) {
 
   // 日历内部交互（事件委托）
   dpPop.addEventListener("click", (e) => {
-    const nav = e.target.closest(".dp-nav");
-    if (nav) {
-      let { y, m } = calView;
-      m += parseInt(nav.dataset.dir, 10);
-      if (m < 1) { m = 12; y--; }
-      if (m > 12) { m = 1; y++; }
-      buildCalendar(y, m);
+    // 月份/年份快选（months 视图点击月份 → 切 days 视图）
+    const month = e.target.closest("[data-nav='pick-d']");
+    if (month) {
+      buildCalendar(calView.y, parseInt(month.dataset.month, 10), "days");
       return;
     }
+    // 年份快选（years 视图点击年份 → 切 months 视图）
+    const year = e.target.closest("[data-nav='pick-m']");
+    if (year) {
+      buildCalendar(parseInt(year.dataset.year, 10), 1, "months");
+      return;
+    }
+    // 标题按钮：days 视图点标题 → months；months 视图点标题 → years
+    const titleBtn = e.target.closest(".dp-title-btn");
+    if (titleBtn) {
+      const nav = titleBtn.dataset.nav;
+      if (nav === "pick-m") buildCalendar(calView.y, 1, "months");
+      else if (nav === "pick-y") buildCalendar(calView.y, 1, "years");
+      else if (nav === "back") buildCalendar(calView.y, 1, "months");
+      return;
+    }
+    // 箭头翻页
+    const navBtn = e.target.closest(".dp-nav");
+    if (navBtn) {
+      const nav = navBtn.dataset.nav;
+      let { y, m } = calView;
+      if (nav === "prev-m") { m--; if (m < 1) { m = 12; y--; } buildCalendar(y, m, "days"); }
+      else if (nav === "next-m") { m++; if (m > 12) { m = 1; y++; } buildCalendar(y, m, "days"); }
+      else if (nav === "prev-y") { y--; buildCalendar(y, m, "months"); }
+      else if (nav === "next-y") { y++; buildCalendar(y, m, "months"); }
+      else if (nav === "prev-12y") { y -= 12; buildCalendar(y, m, "years"); }
+      else if (nav === "next-12y") { y += 12; buildCalendar(y, m, "years"); }
+      return;
+    }
+    // 日期点击
     const day = e.target.closest(".dp-day");
     if (day && day.dataset.date && !day.disabled) {
       switchDate(day.dataset.date);
