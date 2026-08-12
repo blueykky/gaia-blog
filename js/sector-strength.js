@@ -1,209 +1,109 @@
 /* ============================================================
-   行业强弱分布 — 交互逻辑（v6 多日期库）
-   30 个申万一级行业 · 3 个日期：2026-08-11 / 2026-08-07 / 2026-08-05
-   5 维筛选：强弱、波动性、连续性、甜品度、颜色
-   标签防重叠 + 入场动画
+   行业强弱分布 — 交互逻辑（v7 数据库驱动 + 动态轴）
+   - 数据来源：window.SECTOR_DB（由 data/sector-db.json 经 build-data.py 生成）
+   - 行业集合固定为数据库中的 31 个，每日期数量一致
+   - 轴范围、刻度、值范围全部根据数据库动态计算
    ============================================================ */
 
-// 基础坐标（覆盖所有日期可能出现的行业）
-const SECTOR_BASE = {
-  "通信":       { x: 0.230, y: 0.583 },
-  "电子":       { x: 0.250, y: 0.640 },  // 8/7, 8/5 独有（申万一级电子）
-  "有色金属":   { x: 0.236, y: 0.575 },
-  "公用事业":   { x: 0.255, y: 0.580 },
-  "银行":       { x: 0.245, y: 0.560 },
-  "建筑材料":   { x: 0.200, y: 0.560 },
-  "基础化工":   { x: 0.186, y: 0.560 },
-  "电子设备":   { x: 0.173, y: 0.560 },  // 8/11 独有
-  "电力设备":   { x: 0.175, y: 0.560 },  // 8/7, 8/5 独有
-  "机械设备":   { x: 0.235, y: 0.555 },
-  "家用电器":   { x: 0.118, y: 0.555 },
-  "环保":       { x: 0.140, y: 0.545 },
-  "建筑装饰":   { x: 0.143, y: 0.510 },
-  "房地产":     { x: 0.158, y: 0.513 },
-  "交通运输":   { x: 0.180, y: 0.510 },
-  "非银金融":   { x: 0.200, y: 0.510 },
-  "医药生物":   { x: 0.245, y: 0.535 },
-  "煤炭":       { x: 0.265, y: 0.530 },
-  "食品饮料":   { x: 0.170, y: 0.495 },
-  "纺织服饰":   { x: 0.118, y: 0.490 },
-  "轻工制造":   { x: 0.105, y: 0.490 },
-  "石油石化":   { x: 0.198, y: 0.480 },
-  "传媒":       { x: 0.180, y: 0.475 },
-  "国防军工":   { x: 0.218, y: 0.480 },
-  "计算机":     { x: 0.160, y: 0.490 },
-  "汽车":       { x: 0.150, y: 0.450 },
-  "社会服务":   { x: 0.160, y: 0.430 },
-  "美容护理":   { x: 0.200, y: 0.455 },
-  "农林牧渔":   { x: 0.202, y: 0.425 },
-  "商贸零售":   { x: 0.135, y: 0.400 },
-  "钢铁":       { x: 0.170, y: 0.410 },
-  "综合":       { x: 0.135, y: 0.305 }
-};
-
-// 各日期的甜品度 + 颜色（连续性由 |value| 自动计算）
-const SECTOR_DATA = {
-  "2026-08-11": {
-    "通信":       { value:  2.47, color: "blue" },
-    "有色金属":   { value: -0.80, color: "red"  },
-    "公用事业":   { value: -0.40, color: "blue" },
-    "银行":       { value:  0.37, color: "blue" },
-    "建筑材料":   { value:  0.43, color: "red"  },
-    "基础化工":   { value: -1.10, color: "blue" },
-    "电子设备":   { value: -1.40, color: "blue" },
-    "机械设备":   { value: -0.00, color: "blue" },
-    "家用电器":   { value:  0.04, color: "red"  },
-    "环保":       { value: -0.90, color: "blue" },
-    "建筑装饰":   { value: -1.40, color: "blue" },
-    "房地产":     { value: -0.90, color: "red"  },
-    "交通运输":   { value: -0.70, color: "blue" },
-    "非银金融":   { value: -0.30, color: "blue" },
-    "医药生物":   { value:  0.53, color: "red"  },
-    "煤炭":       { value:  0.29, color: "blue" },
-    "食品饮料":   { value: -0.50, color: "blue" },
-    "纺织服饰":   { value: -0.60, color: "red"  },
-    "轻工制造":   { value: -1.50, color: "red"  },
-    "石油石化":   { value: -1.20, color: "blue" },
-    "传媒":       { value: -1.20, color: "red"  },
-    "国防军工":   { value: -1.80, color: "blue" },
-    "计算机":     { value: -1.10, color: "blue" },
-    "汽车":       { value: -1.40, color: "red"  },
-    "社会服务":   { value: -1.50, color: "red"  },
-    "美容护理":   { value: -1.40, color: "blue" },
-    "农林牧渔":   { value: -1.60, color: "blue" },
-    "商贸零售":   { value: -1.50, color: "red"  },
-    "钢铁":       { value: -2.40, color: "blue" },
-    "综合":       { value: -1.00, color: "blue" }
-  },
-  "2026-08-07": {
-    "通信":       { value:  2.92, color: "blue" },
-    "电子":       { value:  3.28, color: "blue" },
-    "公用事业":   { value: -0.60, color: "blue" },
-    "银行":       { value:  0.24, color: "blue" },
-    "有色金属":   { value: -0.60, color: "red"  },
-    "建筑材料":   { value:  0.47, color: "red"  },
-    "基础化工":   { value: -1.10, color: "blue" },
-    "电力设备":   { value: -1.20, color: "blue" },
-    "机械设备":   { value:  0.03, color: "blue" },
-    "家用电器":   { value: -0.00, color: "red"  },
-    "环保":       { value: -1.00, color: "blue" },
-    "建筑装饰":   { value: -1.40, color: "blue" },
-    "房地产":     { value: -1.10, color: "red"  },
-    "交通运输":   { value: -0.70, color: "blue" },
-    "非银金融":   { value: -0.40, color: "blue" },
-    "医药生物":   { value:  0.33, color: "red"  },
-    "煤炭":       { value: -0.10, color: "blue" },
-    "石油石化":   { value: -2.00, color: "blue" },
-    "食品饮料":   { value: -0.80, color: "blue" },
-    "传媒":       { value: -1.40, color: "red"  },
-    "国防军工":   { value: -1.80, color: "blue" },
-    "计算机":     { value: -1.10, color: "blue" },
-    "纺织服饰":   { value: -0.90, color: "red"  },
-    "轻工制造":   { value: -1.50, color: "red"  },
-    "汽车":       { value: -1.50, color: "red"  },
-    "社会服务":   { value: -1.70, color: "red"  },
-    "美容护理":   { value: -1.50, color: "blue" },
-    "农林牧渔":   { value: -1.90, color: "blue" },
-    "商贸零售":   { value: -1.70, color: "red"  },
-    "钢铁":       { value: -2.60, color: "blue" },
-    "综合":       { value: -1.60, color: "blue" }
-  },
-  "2026-08-05": {
-    "通信":       { value:  2.63, color: "blue" },
-    "电子":       { value:  2.77, color: "blue" },
-    "公用事业":   { value: -0.20, color: "blue" },
-    "银行":       { value:  0.40, color: "blue" },
-    "有色金属":   { value: -0.10, color: "red"  },
-    "建筑材料":   { value:  0.00, color: "red"  },
-    "基础化工":   { value: -1.00, color: "blue" },
-    "电力设备":   { value: -0.80, color: "blue" },
-    "机械设备":   { value: -0.10, color: "blue" },
-    "家用电器":   { value:  0.16, color: "red"  },
-    "环保":       { value: -0.60, color: "blue" },
-    "煤炭":       { value: -0.10, color: "blue" },
-    "医药生物":   { value:  0.30, color: "red"  },
-    "交通运输":   { value: -0.60, color: "blue" },
-    "房地产":     { value: -1.00, color: "blue" },
-    "非银金融":   { value: -0.10, color: "blue" },
-    "石油石化":   { value: -2.10, color: "blue" },
-    "食品饮料":   { value: -0.50, color: "blue" },
-    "建筑装饰":   { value: -1.00, color: "blue" },
-    "国防军工":   { value: -2.00, color: "blue" },
-    "传媒":       { value: -1.00, color: "red"  },
-    "纺织服饰":   { value: -0.70, color: "red"  },
-    "轻工制造":   { value: -1.40, color: "red"  },
-    "计算机":     { value: -0.50, color: "blue" },
-    "汽车":       { value: -1.30, color: "blue" },
-    "社会服务":   { value: -1.40, color: "red"  },
-    "美容护理":   { value: -1.40, color: "blue" },
-    "农林牧渔":   { value: -1.40, color: "blue" },
-    "商贸零售":   { value: -1.50, color: "red"  },
-    "钢铁":       { value: -2.40, color: "blue" },
-    "综合":       { value: -1.00, color: "blue" }
-  }
-};
-
-// 视图
+// ---------- 视图基础常量 ----------
 const VIEW = { w: 1000, h: 700, pad: { top: 50, right: 60, bottom: 60, left: 60 } };
-const X_RANGE = [0.08, 0.28];
-const Y_RANGE = [0.30, 0.65];
 const COLOR = { blue: "#7B92B5", red: "#DC5F5F" };
+const CONT_RANGE = [0, 10];   // 连续性固定 0-10（按定义）
 
-// 当前日期（按日期排序，最新在前）
-const AVAILABLE_DATES = Object.keys(SECTOR_DATA).sort().reverse();
-let currentDate = AVAILABLE_DATES[0];
+// 业务参考线
+const REF_Y = 0.50;  // 强弱分界
+const REF_X = 0.21;  // 波动性分界
 
-// URL hash 支持直接打开特定日期：sector-strength-0811.html#date=2026-08-07
-const hashDate = (typeof location !== "undefined" && location.hash || "")
-  .replace("#date=", "").match(/^\d{4}-\d{2}-\d{2}$/) ? location.hash.replace("#date=", "") : null;
-if (hashDate && SECTOR_DATA[hashDate]) {
-  currentDate = hashDate;
+// ---------- 从 SECTOR_DB 计算动态范围 ----------
+function computeRanges(db) {
+  const indMap = {};
+  db.industries.forEach(ind => indMap[ind.name] = ind);
+
+  let xMin = Infinity, xMax = -Infinity;
+  let yMin = Infinity, yMax = -Infinity;
+  let vMin = Infinity, vMax = -Infinity;
+
+  Object.values(db.dates).forEach(dateData => {
+    Object.entries(dateData).forEach(([name, d]) => {
+      if (!d) return;
+      const ind = indMap[name];
+      if (!ind) return;
+      xMin = Math.min(xMin, ind.x);
+      xMax = Math.max(xMax, ind.x);
+      yMin = Math.min(yMin, ind.y);
+      yMax = Math.max(yMax, ind.y);
+      vMin = Math.min(vMin, d.value);
+      vMax = Math.max(vMax, d.value);
+    });
+  });
+
+  const xSpan = xMax - xMin;
+  const ySpan = yMax - yMin;
+  const xPad = xSpan * 0.06;
+  const yPad = ySpan * 0.06;
+
+  return {
+    X: [xMin - xPad, xMax + xPad],
+    Y: [yMin - yPad, yMax + yPad],
+    V: [Math.floor((vMin - 0.5) * 2) / 2, Math.ceil((vMax + 0.5) * 2) / 2]
+  };
 }
 
-const DEFAULT_FILTER = {
-  yLo: 0.30, yHi: 0.65,
-  xLo: 0.08, xHi: 0.28,
-  cLo: 0,    cHi: 10,
-  vLo: -3.5, vHi: 3.5,
-  color: "all"
-};
+// nice ticks 算法
+function niceTicks(min, max, count) {
+  const span = max - min;
+  const step0 = span / Math.max(count, 1);
+  const mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const norm = step0 / mag;
+  let step;
+  if (norm < 1.5) step = 1;
+  else if (norm < 3) step = 2;
+  else if (norm < 7) step = 5;
+  else step = 10;
+  step *= mag;
+  const start = Math.ceil(min / step) * step;
+  const ticks = [];
+  for (let v = start; v <= max + 1e-9; v += step) {
+    ticks.push(Math.round(v * 1000) / 1000);
+  }
+  return ticks;
+}
 
-let state = { ...DEFAULT_FILTER, current: null };
+function rScale(v) { return 8 + Math.min(Math.abs(v), 3) * 4.5; }
 
-// 构造某日期的完整 sector 列表（基础坐标 + 数据 + 自动算 cont）
-function buildSectors(date) {
-  const data = SECTOR_DATA[date];
-  return Object.keys(SECTOR_BASE).map(name => {
-    const base = SECTOR_BASE[name];
-    const d = data[name];
-    if (!d) return null;  // 该日期没这个行业的图数据
-    const value = d.value;
-    const color = d.color;
+// ---------- 构建 sectors（固定行业集合，按日期填充） ----------
+function buildSectors(date, db) {
+  return db.industries.map(ind => {
+    const d = db.dates[date][ind.name];
+    const value = d ? d.value : 0;
+    const color = d ? d.color : "blue";
     const abs = Math.min(Math.abs(value), 3);
     return {
-      name,
-      x: base.x,
-      y: base.y,
+      name: ind.name,
+      x: ind.x,
+      y: ind.y,
       value,
       color,
       cont: Math.round(abs * 10 / 3 * 10) / 10
     };
-  }).filter(Boolean);
+  });
 }
 
-let currentSectors = buildSectors(currentDate);
-
-// ---------- 安全取元素 ----------
+// ---------- 主逻辑 ----------
 function $(id) { return document.getElementById(id); }
 const svg = $("chart");
 const tooltip = $("tooltip");
 const countEl = $("dot-count");
 
-if (!svg || !tooltip) {
-  // 关键容器缺失：静默退出
+if (!svg || !tooltip || !window.SECTOR_DB) {
+  // 关键容器或数据库缺失：静默退出
 } else {
 
-const dots = [];
+const DB = window.SECTOR_DB;
+const ranges = computeRanges(DB);
+const X_RANGE = ranges.X;
+const Y_RANGE = ranges.Y;
+const V_RANGE = ranges.V;
 
 const xScale = (x) => {
   const innerW = VIEW.w - VIEW.pad.left - VIEW.pad.right;
@@ -213,7 +113,27 @@ const yScale = (y) => {
   const innerH = VIEW.h - VIEW.pad.top - VIEW.pad.bottom;
   return VIEW.pad.top + (Y_RANGE[1] - y) / (Y_RANGE[1] - Y_RANGE[0]) * innerH;
 };
-const rScale = (v) => 8 + Math.min(Math.abs(v), 3) * 4.5;
+
+// ---------- 排序后的日期（最新在前） ----------
+const AVAILABLE_DATES = Object.keys(DB.dates).sort().reverse();
+let currentDate = AVAILABLE_DATES[0];
+
+// URL hash 支持：#date=2026-08-07
+const hashDate = (location.hash || "").replace("#date=", "").match(/^\d{4}-\d{2}-\d{2}$/) ? location.hash.replace("#date=", "") : null;
+if (hashDate && DB.dates[hashDate]) currentDate = hashDate;
+
+let currentSectors = buildSectors(currentDate, DB);
+
+const state = {
+  yLo: Y_RANGE[0], yHi: Y_RANGE[1],
+  xLo: X_RANGE[0], xHi: X_RANGE[1],
+  cLo: CONT_RANGE[0], cHi: CONT_RANGE[1],
+  vLo: V_RANGE[0],  vHi: V_RANGE[1],
+  color: "all",
+  current: null
+};
+
+const dots = [];
 
 function svgEl(name, attrs, parent) {
   const el = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -225,24 +145,35 @@ function svgEl(name, attrs, parent) {
   return el;
 }
 
-// ---------- 坐标轴 + 日期标签 ----------
+// ---------- 坐标轴（动态范围 + 动态刻度） ----------
 function renderAxes(date) {
   const innerW = VIEW.w - VIEW.pad.left - VIEW.pad.right;
   const innerH = VIEW.h - VIEW.pad.top - VIEW.pad.bottom;
 
-  const yMid = yScale(0.50);
-  svgEl("line", { x1: VIEW.pad.left, y1: yMid, x2: VIEW.pad.left + innerW, y2: yMid, class: "axis-line" }, svg);
+  // 参考线：仅当在范围内时画
+  if (REF_Y >= Y_RANGE[0] && REF_Y <= Y_RANGE[1]) {
+    const yMid = yScale(REF_Y);
+    svgEl("line", { x1: VIEW.pad.left, y1: yMid, x2: VIEW.pad.left + innerW, y2: yMid, class: "axis-line" }, svg);
+  }
+  if (REF_X >= X_RANGE[0] && REF_X <= X_RANGE[1]) {
+    const xMid = xScale(REF_X);
+    svgEl("line", { x1: xMid, y1: VIEW.pad.top, x2: xMid, y2: VIEW.pad.top + innerH, class: "axis-line" }, svg);
+  }
 
-  const xMid = xScale(0.21);
-  svgEl("line", { x1: xMid, y1: VIEW.pad.top, x2: xMid, y2: VIEW.pad.top + innerH, class: "axis-line" }, svg);
+  // 动态刻度
+  const xTicks = niceTicks(X_RANGE[0], X_RANGE[1], 5);
+  const yTicks = niceTicks(Y_RANGE[0], Y_RANGE[1], 6);
 
-  [0.08, 0.13, 0.18, 0.23, 0.28].forEach(v => {
+  xTicks.forEach(v => {
+    if (v < X_RANGE[0] || v > X_RANGE[1]) return;
     svgEl("text", { x: xScale(v), y: VIEW.pad.top + innerH + 24, "text-anchor": "middle", class: "axis-label", text: v.toFixed(2) }, svg);
   });
-  [0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60, 0.65].forEach(v => {
+  yTicks.forEach(v => {
+    if (v < Y_RANGE[0] || v > Y_RANGE[1]) return;
     svgEl("text", { x: VIEW.pad.left - 12, y: yScale(v) + 4, "text-anchor": "end", class: "axis-label", text: v.toFixed(2) }, svg);
   });
 
+  // 轴标题
   svgEl("text", { x: VIEW.pad.left + innerW / 2, y: VIEW.h - 18, "text-anchor": "middle", class: "axis-title", text: "波动性" }, svg);
   svgEl("text", { x: 18, y: VIEW.pad.top + innerH / 2, transform: "rotate(-90 18 " + (VIEW.pad.top + innerH / 2) + ")", "text-anchor": "middle", class: "axis-title", text: "强弱势级" }, svg);
   svgEl("text", { x: VIEW.w - VIEW.pad.right, y: VIEW.pad.top - 16, "text-anchor": "end", class: "date-tag", text: date.replace(/-/g, ".") }, svg);
@@ -408,7 +339,7 @@ function moveTooltip(e) {
   tooltip.style.top = (e.clientY - area.top) + "px";
 }
 
-// ---------- 双端范围滑块组件 ----------
+// ---------- 双端范围滑块 ----------
 function createDualRange(trackEl, valEl, min, max, lo, hi, onChange, step) {
   if (!trackEl) return null;
   const rail = document.createElement("div"); rail.className = "df-rail";
@@ -481,8 +412,8 @@ function createDualRange(trackEl, valEl, min, max, lo, hi, onChange, step) {
 }
 
 function createFilterControl(trackId, valId, min, max, lo, hi, onChange, step) {
-  const trackEl = $(trackId);
-  const valEl = $(valId);
+  const trackEl = $(trackId) || $(trackId.replace("df-", "filter-"));
+  const valEl = $(valId) || $(valId.replace("df-", "filter-"));
   if (!trackEl) return null;
   if (trackEl.tagName === "DIV") {
     return createDualRange(trackEl, valEl, min, max, lo, hi, onChange, step);
@@ -502,47 +433,60 @@ function createFilterControl(trackId, valId, min, max, lo, hi, onChange, step) {
 }
 
 // ---------- 控件绑定 ----------
-const filterBindings = [
-  { trackId: "df-y", valId: "df-y-values", min: 0.30, max: 0.65, key: "y", step: 0.01 },
-  { trackId: "df-x", valId: "df-x-values", min: 0.08, max: 0.28, key: "x", step: 0.01 },
-  { trackId: "df-c", valId: "df-c-values", min: 0,    max: 10,   key: "c", step: 0.1  },
-  { trackId: "df-v", valId: "df-v-values", min: -3.5, max: 3.5,  key: "v", step: 0.01 }
+const bindings = [
+  { id: "y", min: Y_RANGE[0], max: Y_RANGE[1], lo: state.yLo, hi: state.yHi, step: 0.005 },
+  { id: "x", min: X_RANGE[0], max: X_RANGE[1], lo: state.xLo, hi: state.xHi, step: 0.005 },
+  { id: "c", min: CONT_RANGE[0], max: CONT_RANGE[1], lo: state.cLo, hi: state.cHi, step: 0.1 },
+  { id: "v", min: V_RANGE[0],  max: V_RANGE[1],  lo: state.vLo,  hi: state.vHi,  step: 0.01 }
 ];
-
-filterBindings.forEach(b => {
-  const trackEl = document.getElementById(b.trackId) || document.getElementById("filter-" + b.key);
-  const valEl = document.getElementById(b.valId) || document.getElementById("filter-" + b.key + "-value");
-  if (!trackEl) return;
-  // 兼容 v2/v3
-  const ctrlId = "df-" + b.key;
-  const valId2 = "df-" + b.key + "-values";
-  createFilterControl(ctrlId, valId2, b.min, b.max, state[b.key + "Lo"], state[b.key + "Hi"], (lo, hi) => {
-    state[b.key + "Lo"] = lo;
-    state[b.key + "Hi"] = hi;
-    applyFilter();
-  }, b.step) || createFilterControl("filter-" + b.key, "filter-" + b.key + "-value", b.min, b.max, state[b.key + "Lo"], state[b.key + "Hi"], (lo, hi) => {
-    state[b.key + "Lo"] = lo;
-    state[b.key + "Hi"] = hi;
+bindings.forEach(b => {
+  const trackId = "df-" + b.id;
+  const valId = "df-" + b.id + "-values";
+  createFilterControl(trackId, valId, b.min, b.max, b.lo, b.hi, (lo, hi) => {
+    if (b.id === "y") { state.yLo = lo; state.yHi = hi; }
+    if (b.id === "x") { state.xLo = lo; state.xHi = hi; }
+    if (b.id === "c") { state.cLo = lo; state.cHi = hi; }
+    if (b.id === "v") { state.vLo = lo; state.vHi = hi; }
     applyFilter();
   }, b.step);
 });
 
 // 颜色按钮组
-const segBtns = document.querySelectorAll(".seg-btn");
-segBtns.forEach(btn => {
+document.querySelectorAll(".seg-btn").forEach(btn => {
   btn.addEventListener("click", () => {
-    segBtns.forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".seg-btn").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
     state.color = btn.dataset.color;
     applyFilter();
   });
 });
 
-// ---------- 日期切换 ----------
+// ---------- 日期切换：动态生成按钮 ----------
+function buildDateButtons() {
+  const dateSeg = $("date-seg");
+  if (!dateSeg) return;
+  dateSeg.innerHTML = "";
+  AVAILABLE_DATES.forEach(date => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "date-btn";
+    btn.dataset.date = date;
+    btn.textContent = date.substring(5); // "08-11"
+    if (date === currentDate) btn.classList.add("active");
+    btn.addEventListener("click", () => {
+      if (btn.dataset.date === currentDate) return;
+      dateSeg.querySelectorAll(".date-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      switchDate(btn.dataset.date);
+    });
+    dateSeg.appendChild(btn);
+  });
+}
+
 function switchDate(date) {
-  if (!SECTOR_DATA[date]) return;
+  if (!DB.dates[date]) return;
   currentDate = date;
-  currentSectors = buildSectors(date);
+  currentSectors = buildSectors(date, DB);
   clearDots();
   renderDots(currentSectors);
   avoidOverlap();
@@ -551,25 +495,11 @@ function switchDate(date) {
   playEnter();
 }
 
-const dateBtns = document.querySelectorAll(".date-btn");
-dateBtns.forEach(btn => {
-  btn.addEventListener("click", () => {
-    if (btn.dataset.date === currentDate) return;
-    dateBtns.forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    switchDate(btn.dataset.date);
-  });
-});
-
 const btnReplay = $("btn-replay");
 if (btnReplay) btnReplay.addEventListener("click", playEnter);
 
-// 启动时根据 currentDate 同步日期按钮 active
-document.querySelectorAll(".date-btn").forEach(b => {
-  b.classList.toggle("active", b.dataset.date === currentDate);
-});
-
 // ---------- 启动 ----------
+buildDateButtons();
 renderAxes(currentDate);
 renderDots(currentSectors);
 avoidOverlap();
