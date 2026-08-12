@@ -65,7 +65,7 @@
 
 .df-track {
   position: relative;
-  width: 150px;
+  width: 130px;
   height: 20px;
   cursor: pointer;
   touch-action: none;
@@ -112,6 +112,48 @@
   font-variant-numeric: tabular-nums;
   color: var(--ink);
   font-size: 13px;
+}
+
+/* ---- 颜色筛选按钮组 ---- */
+.colorfilter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.color-seg {
+  display: flex;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.seg-btn {
+  appearance: none;
+  background: #FFFFFF;
+  border: none;
+  padding: 5px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.seg-btn + .seg-btn {
+  border-left: 1px solid var(--hairline);
+}
+
+.seg-btn:hover {
+  color: var(--ink);
+}
+
+.seg-btn.active {
+  background: var(--ink);
+  color: #FFFFFF;
 }
 
 .ctrl-range {
@@ -273,6 +315,7 @@
 /* 响应式 */
 @media (max-width: 640px) {
   .controls { gap: 8px 10px; }
+  .df-track { width: 110px; }
   .ctrl-range input[type="range"] { width: 110px; }
   .dot-label { font-size: 10px; }
 }
