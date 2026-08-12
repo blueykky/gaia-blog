@@ -8,7 +8,7 @@
 // ---------- 视图基础常量 ----------
 const VIEW = { w: 1000, h: 700, pad: { top: 50, right: 60, bottom: 60, left: 60 } };
 const COLOR = { blue: "#7B92B5", red: "#DC5F5F" };
-const CONT_RANGE = [0, 10];   // 连续性固定 0-10（按定义）
+const CONT_RANGE = [0.6, 1.2];   // 连续性：比值制（围绕 1.0），所有日期统一标尺
 
 // 业务参考线
 const REF_Y = 0.50;  // 强弱分界
@@ -64,7 +64,12 @@ function niceTicks(min, max, count) {
   return ticks;
 }
 
-function rScale(v) { return 8 + Math.min(Math.abs(v), 3) * 4.5; }
+function rScale(cont) {
+  // 连续性（比值制，围绕 1.0）映射到圆半径 8-21.5
+  // 0.6 → 8（最小），1.2 → 21.5（最大），超出截断
+  const c = Math.max(0.6, Math.min(1.2, cont));
+  return 8 + (c - 0.6) / 0.6 * 13.5;
+}
 
 // ---------- 构建 sectors（直接取数据库中该日期的数组，每条数据带完整坐标） ----------
 function buildSectors(date, db) {
@@ -173,7 +178,7 @@ function renderDots(sectors) {
   sectors.forEach((d) => {
     const cx = xScale(d.x);
     const cy = yScale(d.y);
-    const r = rScale(d.value);
+    const r = rScale(d.cont);
 
     const g = svgEl("g", { class: "dot", "data-name": d.name }, svg);
     const circle = svgEl("circle", {
@@ -418,7 +423,7 @@ function createFilterControl(trackId, valId, min, max, lo, hi, onChange, step) {
 const bindings = [
   { id: "y", min: Y_RANGE[0], max: Y_RANGE[1], lo: state.yLo, hi: state.yHi, step: 0.005 },
   { id: "x", min: X_RANGE[0], max: X_RANGE[1], lo: state.xLo, hi: state.xHi, step: 0.005 },
-  { id: "c", min: CONT_RANGE[0], max: CONT_RANGE[1], lo: state.cLo, hi: state.cHi, step: 0.1 },
+  { id: "c", min: 0.6, max: 1.2, lo: 0.6, hi: 1.2, step: 0.05 },
   { id: "v", min: V_RANGE[0],  max: V_RANGE[1],  lo: state.vLo,  hi: state.vHi,  step: 0.01 }
 ];
 bindings.forEach(b => {
