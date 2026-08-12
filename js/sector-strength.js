@@ -8,8 +8,6 @@
 // ---------- 视图基础常量 ----------
 const VIEW = { w: 1000, h: 700, pad: { top: 50, right: 60, bottom: 60, left: 60 } };
 const COLOR = { blue: "#7B92B5", red: "#DC5F5F" };
-// 圆大小：直接用连续性数值线性绘制，不做区间映射（r = cont × R_SCALE）
-const R_SCALE = 18;
 
 // 业务参考线
 const REF_Y = 0.50;  // 强弱分界
@@ -40,13 +38,15 @@ function computeRanges(db) {
   const ySpan = yMax - yMin;
   const xPad = xSpan * 0.06;
   const yPad = ySpan * 0.06;
-  const cPad = (cMax - cMin) * 0.08 || 0.05;
+  const cSpan = cMax - cMin || 0.1;
+  const cPad = cSpan * 0.08;
 
   return {
     X: [xMin - xPad, xMax + xPad],
     Y: [yMin - yPad, yMax + yPad],
     V: [Math.floor((vMin - 0.5) * 2) / 2, Math.ceil((vMax + 0.5) * 2) / 2],
-    C: [Math.round((cMin - cPad) * 100) / 100, Math.round((cMax + cPad) * 100) / 100]
+    C: [Math.round((cMin - cPad) * 100) / 100, Math.round((cMax + cPad) * 100) / 100],
+    C_RAW: [cMin, cMax]
   };
 }
 
@@ -70,9 +70,16 @@ function niceTicks(min, max, count) {
   return ticks;
 }
 
+// 圆大小：将连续性(cont)按数据库全局范围归一化后映射到 [R_MIN, R_MAX]，
+// 拉大圆大小差异（最大/最小 ≈ 4.3 倍），便于肉眼分辨
+const R_MIN = 6;
+const R_MAX = 26;
+
 function rScale(cont) {
-  // 直接用连续性数值线性绘制（不做区间映射/归一化）
-  return cont * R_SCALE;
+  const [cLo, cHi] = C_RAW;
+  const span = (cHi - cLo) || 0.1;
+  const t = Math.min(1, Math.max(0, (cont - cLo) / span));
+  return R_MIN + t * (R_MAX - R_MIN);
 }
 
 // ---------- 构建 sectors（直接取数据库中该日期的数组，每条数据带完整坐标） ----------
@@ -96,6 +103,7 @@ const X_RANGE = ranges.X;
 const Y_RANGE = ranges.Y;
 const V_RANGE = ranges.V;
 const C_RANGE = ranges.C;
+const C_RAW = ranges.C_RAW;
 
 const xScale = (x) => {
   const innerW = VIEW.w - VIEW.pad.left - VIEW.pad.right;
