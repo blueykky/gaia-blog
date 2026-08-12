@@ -71,20 +71,20 @@ function niceTicks(min, max, count) {
 
 function rScale(v) { return 8 + Math.min(Math.abs(v), 3) * 4.5; }
 
-// ---------- 构建 sectors（固定行业集合，按日期填充） ----------
+// ---------- 构建 sectors（固定行业集合，按日期填充；cont 直接取数据库值） ----------
 function buildSectors(date, db) {
   return db.industries.map(ind => {
     const d = db.dates[date][ind.name];
     const value = d ? d.value : 0;
     const color = d ? d.color : "blue";
-    const abs = Math.min(Math.abs(value), 3);
+    const cont = d && typeof d.cont === "number" ? d.cont : 0;
     return {
       name: ind.name,
       x: ind.x,
       y: ind.y,
       value,
       color,
-      cont: Math.round(abs * 10 / 3 * 10) / 10
+      cont
     };
   });
 }

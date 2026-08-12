@@ -170,379 +170,472 @@ window.SECTOR_DB = {
     "2026-08-11": {
       "通信": {
         "value": 2.47,
-        "color": "blue"
+        "color": "blue",
+        "cont": 8.2
       },
       "电子": {
         "value": 3.09,
-        "color": "blue"
+        "color": "blue",
+        "cont": 10.0
       },
       "有色金属": {
         "value": -0.8,
-        "color": "red"
+        "color": "red",
+        "cont": 2.7
       },
       "公用事业": {
         "value": -0.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.3
       },
       "银行": {
         "value": 0.37,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.2
       },
       "建筑材料": {
         "value": 0.43,
-        "color": "red"
+        "color": "red",
+        "cont": 1.4
       },
       "基础化工": {
         "value": -1.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.7
       },
       "电力设备": {
         "value": -1.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.7
       },
       "机械设备": {
         "value": -0.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 0.0
       },
       "家用电器": {
         "value": 0.04,
-        "color": "red"
+        "color": "red",
+        "cont": 0.1
       },
       "环保": {
         "value": -0.9,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.0
       },
       "建筑装饰": {
         "value": -1.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.7
       },
       "房地产": {
         "value": -0.9,
-        "color": "red"
+        "color": "red",
+        "cont": 3.0
       },
       "交通运输": {
         "value": -0.7,
-        "color": "blue"
+        "color": "blue",
+        "cont": 2.3
       },
       "非银金融": {
         "value": -0.3,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.0
       },
       "医药生物": {
         "value": 0.53,
-        "color": "red"
+        "color": "red",
+        "cont": 1.8
       },
       "煤炭": {
         "value": 0.29,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.0
       },
       "食品饮料": {
         "value": -0.5,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.7
       },
       "纺织服饰": {
         "value": -0.6,
-        "color": "red"
+        "color": "red",
+        "cont": 2.0
       },
       "轻工制造": {
         "value": -1.5,
-        "color": "red"
+        "color": "red",
+        "cont": 5.0
       },
       "石油石化": {
         "value": -1.2,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.0
       },
       "传媒": {
         "value": -1.2,
-        "color": "red"
+        "color": "red",
+        "cont": 4.0
       },
       "国防军工": {
         "value": -1.8,
-        "color": "blue"
+        "color": "blue",
+        "cont": 6.0
       },
       "计算机": {
         "value": -1.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.7
       },
       "汽车": {
         "value": -1.4,
-        "color": "red"
+        "color": "red",
+        "cont": 4.7
       },
       "社会服务": {
         "value": -1.5,
-        "color": "red"
+        "color": "red",
+        "cont": 5.0
       },
       "美容护理": {
         "value": -1.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.7
       },
       "农林牧渔": {
         "value": -1.6,
-        "color": "blue"
+        "color": "blue",
+        "cont": 5.3
       },
       "商贸零售": {
         "value": -1.5,
-        "color": "red"
+        "color": "red",
+        "cont": 5.0
       },
       "钢铁": {
         "value": -2.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 8.0
       },
       "综合": {
         "value": -1.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.3
       }
     },
     "2026-08-07": {
       "通信": {
         "value": 2.92,
-        "color": "blue"
+        "color": "blue",
+        "cont": 9.7
       },
       "电子": {
         "value": 3.28,
-        "color": "blue"
+        "color": "blue",
+        "cont": 10.0
       },
       "有色金属": {
         "value": -0.6,
-        "color": "red"
+        "color": "red",
+        "cont": 2.0
       },
       "公用事业": {
         "value": -0.6,
-        "color": "blue"
+        "color": "blue",
+        "cont": 2.0
       },
       "银行": {
         "value": 0.24,
-        "color": "blue"
+        "color": "blue",
+        "cont": 0.8
       },
       "建筑材料": {
         "value": 0.47,
-        "color": "red"
+        "color": "red",
+        "cont": 1.6
       },
       "基础化工": {
         "value": -1.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.7
       },
       "电力设备": {
         "value": -1.2,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.0
       },
       "机械设备": {
         "value": 0.03,
-        "color": "blue"
+        "color": "blue",
+        "cont": 0.1
       },
       "家用电器": {
         "value": -0.0,
-        "color": "red"
+        "color": "red",
+        "cont": 0.0
       },
       "环保": {
         "value": -1.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.3
       },
       "建筑装饰": {
         "value": -1.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.7
       },
       "房地产": {
         "value": -1.1,
-        "color": "red"
+        "color": "red",
+        "cont": 3.7
       },
       "交通运输": {
         "value": -0.7,
-        "color": "blue"
+        "color": "blue",
+        "cont": 2.3
       },
       "非银金融": {
         "value": -0.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.3
       },
       "医药生物": {
         "value": 0.33,
-        "color": "red"
+        "color": "red",
+        "cont": 1.1
       },
       "煤炭": {
         "value": -0.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 0.3
       },
       "食品饮料": {
         "value": -0.8,
-        "color": "blue"
+        "color": "blue",
+        "cont": 2.7
       },
       "纺织服饰": {
         "value": -0.9,
-        "color": "red"
+        "color": "red",
+        "cont": 3.0
       },
       "轻工制造": {
         "value": -1.5,
-        "color": "red"
+        "color": "red",
+        "cont": 5.0
       },
       "石油石化": {
         "value": -2.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 6.7
       },
       "传媒": {
         "value": -1.4,
-        "color": "red"
+        "color": "red",
+        "cont": 4.7
       },
       "国防军工": {
         "value": -1.8,
-        "color": "blue"
+        "color": "blue",
+        "cont": 6.0
       },
       "计算机": {
         "value": -1.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.7
       },
       "汽车": {
         "value": -1.5,
-        "color": "red"
+        "color": "red",
+        "cont": 5.0
       },
       "社会服务": {
         "value": -1.7,
-        "color": "red"
+        "color": "red",
+        "cont": 5.7
       },
       "美容护理": {
         "value": -1.5,
-        "color": "blue"
+        "color": "blue",
+        "cont": 5.0
       },
       "农林牧渔": {
         "value": -1.9,
-        "color": "blue"
+        "color": "blue",
+        "cont": 6.3
       },
       "商贸零售": {
         "value": -1.7,
-        "color": "red"
+        "color": "red",
+        "cont": 5.7
       },
       "钢铁": {
         "value": -2.6,
-        "color": "blue"
+        "color": "blue",
+        "cont": 8.7
       },
       "综合": {
         "value": -1.6,
-        "color": "blue"
+        "color": "blue",
+        "cont": 5.3
       }
     },
     "2026-08-05": {
       "通信": {
         "value": 2.63,
-        "color": "blue"
+        "color": "blue",
+        "cont": 8.8
       },
       "电子": {
         "value": 2.77,
-        "color": "blue"
+        "color": "blue",
+        "cont": 9.2
       },
       "有色金属": {
         "value": -0.1,
-        "color": "red"
+        "color": "red",
+        "cont": 0.3
       },
       "公用事业": {
         "value": -0.2,
-        "color": "blue"
+        "color": "blue",
+        "cont": 0.7
       },
       "银行": {
         "value": 0.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.3
       },
       "建筑材料": {
         "value": 0.0,
-        "color": "red"
+        "color": "red",
+        "cont": 0.0
       },
       "基础化工": {
         "value": -1.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.3
       },
       "电力设备": {
         "value": -0.8,
-        "color": "blue"
+        "color": "blue",
+        "cont": 2.7
       },
       "机械设备": {
         "value": -0.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 0.3
       },
       "家用电器": {
         "value": 0.16,
-        "color": "red"
+        "color": "red",
+        "cont": 0.5
       },
       "环保": {
         "value": -0.6,
-        "color": "blue"
+        "color": "blue",
+        "cont": 2.0
       },
       "建筑装饰": {
         "value": -1.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.3
       },
       "房地产": {
         "value": -1.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.3
       },
       "交通运输": {
         "value": -0.6,
-        "color": "blue"
+        "color": "blue",
+        "cont": 2.0
       },
       "非银金融": {
         "value": -0.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 0.3
       },
       "医药生物": {
         "value": 0.3,
-        "color": "red"
+        "color": "red",
+        "cont": 1.0
       },
       "煤炭": {
         "value": -0.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 0.3
       },
       "食品饮料": {
         "value": -0.5,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.7
       },
       "纺织服饰": {
         "value": -0.7,
-        "color": "red"
+        "color": "red",
+        "cont": 2.3
       },
       "轻工制造": {
         "value": -1.4,
-        "color": "red"
+        "color": "red",
+        "cont": 4.7
       },
       "石油石化": {
         "value": -2.1,
-        "color": "blue"
+        "color": "blue",
+        "cont": 7.0
       },
       "传媒": {
         "value": -1.0,
-        "color": "red"
+        "color": "red",
+        "cont": 3.3
       },
       "国防军工": {
         "value": -2.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 6.7
       },
       "计算机": {
         "value": -0.5,
-        "color": "blue"
+        "color": "blue",
+        "cont": 1.7
       },
       "汽车": {
         "value": -1.3,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.3
       },
       "社会服务": {
         "value": -1.4,
-        "color": "red"
+        "color": "red",
+        "cont": 4.7
       },
       "美容护理": {
         "value": -1.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.7
       },
       "农林牧渔": {
         "value": -1.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 4.7
       },
       "商贸零售": {
         "value": -1.5,
-        "color": "red"
+        "color": "red",
+        "cont": 5.0
       },
       "钢铁": {
         "value": -2.4,
-        "color": "blue"
+        "color": "blue",
+        "cont": 8.0
       },
       "综合": {
         "value": -1.0,
-        "color": "blue"
+        "color": "blue",
+        "cont": 3.3
       }
     }
   }

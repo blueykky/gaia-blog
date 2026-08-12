@@ -21,12 +21,21 @@ def main():
     dates = db["dates"]
     ind_names = [ind["name"] for ind in industries]
 
-    # ---- 校验：每个日期行业必须齐全 ----
+    # ---- 校验：每个日期行业必须齐全 + cont 必须存在 ----
     errors = []
     for date, data in dates.items():
         missing = [n for n in ind_names if n not in data or data[n] is None]
         if missing:
             errors.append(f"{date} 缺失行业: {', '.join(missing)}")
+        for name, d in data.items():
+            if d is None:
+                continue
+            if "value" not in d:
+                errors.append(f"{date} {name} 缺 value")
+            if "color" not in d:
+                errors.append(f"{date} {name} 缺 color")
+            if "cont" not in d:
+                errors.append(f"{date} {name} 缺 cont（连续性）")
 
     if errors:
         print("!! 数据完整性校验失败（未生成 js/sector-data.js）:")
