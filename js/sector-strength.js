@@ -93,16 +93,17 @@ const V_RANGE = ranges.V;
 const C_RANGE = ranges.C;
 const C_RAW = ranges.C_RAW;
 
-// 圆大小：将连续性(cont)按数据库全局范围归一化后映射到 [R_MIN, R_MAX]，
-// 拉大圆大小差异（最大/最小 ≈ 4.3 倍），便于肉眼分辨
-const R_MIN = 6;
-const R_MAX = 26;
+// 圆大小：连续性(cont)按全局范围归一化 → 幂次平滑 → 映射到 [R_MIN, R_MAX]
+// 幂次 R_POW>1：高值区（数据密集）区分度放大、中间值下压，避免"大圆太多、过渡不平滑"
+const R_MIN = 5;
+const R_MAX = 19;
+const R_POW = 1.6;
 
 function rScale(cont) {
   const [cLo, cHi] = C_RAW;
   const span = (cHi - cLo) || 0.1;
   const t = Math.min(1, Math.max(0, (cont - cLo) / span));
-  return R_MIN + t * (R_MAX - R_MIN);
+  return R_MIN + Math.pow(t, R_POW) * (R_MAX - R_MIN);
 }
 
 const xScale = (x) => {
