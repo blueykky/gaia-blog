@@ -122,6 +122,24 @@ a:focus-visible {
   max-width: 560px;
 }
 
+.hero-mini {
+  margin-top: 14px !important;
+  font-size: 14px !important;
+  color: var(--ink-faint) !important;
+}
+
+.hero-mini a {
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 1px;
+  transition: color .18s ease, border-color .18s ease;
+}
+
+.hero-mini a:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
 /* ---------------- 首页：画廊网格 ---------------- */
 .gallery {
   padding: 0 0 10vh;

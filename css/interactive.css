@@ -1,0 +1,221 @@
+/* ============================================================
+   行业强弱分布 — 交互页样式
+   继承 site.css 配色变量，仅补充交互相关样式
+   ============================================================ */
+
+.interactive-wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 8px 0 24px;
+}
+
+.post-sub {
+  margin-top: 6px;
+  font-size: 16px;
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+/* ---- 控件区 ---- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  padding: 10px 0 18px;
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 18px;
+}
+
+.ctrl-btn {
+  appearance: none;
+  background: #FFFFFF;
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease, border-color .18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ctrl-btn:hover {
+  border-color: var(--ink-soft);
+}
+
+.ctrl-btn.active {
+  background: var(--ink);
+  color: #FFFFFF;
+  border-color: var(--ink);
+}
+
+.ctrl-range {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.ctrl-range input[type="range"] {
+  width: 140px;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+
+.ctrl-range span {
+  min-width: 64px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* ---- 图表区 ---- */
+.chart-area {
+  position: relative;
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 6px;
+}
+
+#chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
+
+/* SVG 内部元素 */
+.axis-line {
+  stroke: #D0D0D5;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.axis-label {
+  fill: var(--ink-faint);
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.axis-title {
+  fill: var(--ink-soft);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.date-tag {
+  fill: var(--ink-soft);
+  font-size: 13px;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.dot {
+  cursor: pointer;
+  transition: opacity .25s ease, transform .25s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.dot circle {
+  transition: r .25s ease, stroke-width .25s ease, opacity .25s ease;
+}
+
+.dot:hover circle {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.dot-label {
+  fill: var(--ink-soft);
+  font-size: 11px;
+  pointer-events: none;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: opacity .25s ease;
+}
+
+.dot.active .dot-label {
+  fill: var(--ink);
+  font-weight: 500;
+}
+
+.dot.faded {
+  opacity: 0.15;
+}
+
+.dot.hidden {
+  display: none;
+}
+
+/* 入场动画初始态 */
+.dot.enter circle {
+  transform: scale(0);
+  transform-origin: center;
+  transform-box: fill-box;
+  opacity: 0;
+}
+
+.dot.enter .dot-label {
+  opacity: 0;
+}
+
+/* ---- tooltip ---- */
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(29, 29, 31, 0.96);
+  color: #FFFFFF;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate(-50%, -100%) translateY(-12px);
+  transition: opacity .15s ease;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.tooltip.show { opacity: 1; }
+
+.tooltip .tt-name {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.tooltip .tt-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.tooltip .tt-row b {
+  color: #FFFFFF;
+  font-weight: 500;
+}
+
+.tooltip .tt-up { color: #8FBBC4; }
+.tooltip .tt-down { color: #E8A3A3; }
+
+/* ---- 说明文字 ---- */
+.caption {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--ink-faint);
+  text-align: center;
+  letter-spacing: 0.02em;
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  .controls { gap: 8px 10px; }
+  .ctrl-range input[type="range"] { width: 110px; }
+  .dot-label { font-size: 10px; }
+}

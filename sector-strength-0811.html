@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>行业强弱分布 · Carrycore</title>
+  <meta name="description" content="2026-08-11 申万一级行业强弱分布交互图：波动性 × 强弱势级，鼠标悬停观察细节。" />
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/interactive.css">
+</head>
+<body>
+
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">Carrycore<em>· 金融视觉志</em></a>
+      <nav class="nav-links" aria-label="主导航">
+        <a href="index.html">首页</a>
+        <a href="sector-strength-0811.html" aria-current="page">交互</a>
+        <a href="about.html">关于</a>
+        <a href="archive.html">归档</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="post">
+
+      <header class="post-head">
+        <h1>行业强弱分布</h1>
+        <time datetime="2026-08-11">2026.08.11</time>
+        <p class="post-sub">波动性 × 强弱势级 · 鼠标悬停观察细节</p>
+      </header>
+
+      <div class="interactive-wrap">
+
+        <div class="controls">
+          <button id="btn-scatter" class="ctrl-btn active" type="button">散点图</button>
+          <button id="btn-bar" class="ctrl-btn" type="button">按涨跌排序</button>
+          <label class="ctrl-range">
+            <span>强弱过滤</span>
+            <input type="range" id="strength-filter" min="0.30" max="0.65" step="0.01" value="0.30">
+            <span id="strength-value">≥ 0.30</span>
+          </label>
+          <button id="btn-replay" class="ctrl-btn" type="button">▶ 重播动画</button>
+        </div>
+
+        <div class="chart-area">
+          <svg id="chart" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" aria-label="行业强弱分布散点图"></svg>
+          <div id="tooltip" class="tooltip" role="tooltip"></div>
+        </div>
+
+        <p class="caption">30 个申万一级行业 · 圆点大小代表涨跌幅绝对值 · 蓝/红色按图还原</p>
+      </div>
+
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <small>© 2026 Carrycore · 用图片说话，用留白呼吸</small>
+      <a href="index.html">返回首页</a>
+    </div>
+  </footer>
+
+  <script src="js/sector-strength.js"></script>
+</body>
+</html>
