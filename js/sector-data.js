@@ -46,15 +46,15 @@ window.SECTOR_DB = {
     "2026-08-12": [
       {
         "name": "通信",
-        "x": 0.235,
-        "y": 0.585,
+        "x": 0.233,
+        "y": 0.583,
         "value": 2.79,
         "color": "blue",
         "cont": 9.3
       },
       {
         "name": "电子",
-        "x": 0.245,
+        "x": 0.247,
         "y": 0.625,
         "value": 3.24,
         "color": "blue",
@@ -62,7 +62,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "有色金属",
-        "x": 0.272,
+        "x": 0.262,
         "y": 0.575,
         "value": -0.7,
         "color": "red",
@@ -70,7 +70,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "公用事业",
-        "x": 0.28,
+        "x": 0.278,
         "y": 0.575,
         "value": -0.8,
         "color": "blue",
@@ -94,7 +94,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "基础化工",
-        "x": 0.18,
+        "x": 0.182,
         "y": 0.56,
         "value": -1.2,
         "color": "blue",
@@ -102,7 +102,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "电力设备",
-        "x": 0.194,
+        "x": 0.175,
         "y": 0.56,
         "value": -1.4,
         "color": "blue",
@@ -110,7 +110,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "机械设备",
-        "x": 0.276,
+        "x": 0.273,
         "y": 0.555,
         "value": 0.08,
         "color": "blue",
@@ -118,7 +118,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "家用电器",
-        "x": 0.115,
+        "x": 0.11,
         "y": 0.555,
         "value": -0.1,
         "color": "red",
@@ -142,7 +142,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "房地产",
-        "x": 0.164,
+        "x": 0.155,
         "y": 0.515,
         "value": -0.7,
         "color": "red",
@@ -158,7 +158,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "非银金融",
-        "x": 0.206,
+        "x": 0.2,
         "y": 0.515,
         "value": -0.4,
         "color": "blue",
@@ -166,7 +166,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "医药生物",
-        "x": 0.268,
+        "x": 0.26,
         "y": 0.545,
         "value": 0.45,
         "color": "red",
@@ -174,7 +174,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "煤炭",
-        "x": 0.265,
+        "x": 0.26,
         "y": 0.535,
         "value": -0.3,
         "color": "blue",
@@ -182,7 +182,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "食品饮料",
-        "x": 0.172,
+        "x": 0.165,
         "y": 0.495,
         "value": -0.5,
         "color": "blue",
@@ -190,7 +190,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "纺织服饰",
-        "x": 0.11,
+        "x": 0.115,
         "y": 0.49,
         "value": -0.7,
         "color": "red",
@@ -198,7 +198,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "轻工制造",
-        "x": 0.12,
+        "x": 0.105,
         "y": 0.49,
         "value": -1.4,
         "color": "red",
@@ -206,7 +206,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "石油石化",
-        "x": 0.202,
+        "x": 0.195,
         "y": 0.48,
         "value": -1.5,
         "color": "blue",
@@ -214,7 +214,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "传媒",
-        "x": 0.176,
+        "x": 0.18,
         "y": 0.48,
         "value": -1.1,
         "color": "red",
@@ -222,7 +222,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "国防军工",
-        "x": 0.209,
+        "x": 0.215,
         "y": 0.485,
         "value": -1.6,
         "color": "blue",
@@ -246,7 +246,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "社会服务",
-        "x": 0.156,
+        "x": 0.16,
         "y": 0.43,
         "value": -1.5,
         "color": "red",
@@ -254,7 +254,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "美容护理",
-        "x": 0.198,
+        "x": 0.2,
         "y": 0.455,
         "value": -1.5,
         "color": "blue",
@@ -262,7 +262,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "农林牧渔",
-        "x": 0.194,
+        "x": 0.2,
         "y": 0.425,
         "value": -1.8,
         "color": "blue",
@@ -270,7 +270,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "商贸零售",
-        "x": 0.137,
+        "x": 0.135,
         "y": 0.4,
         "value": -1.5,
         "color": "red",
@@ -278,7 +278,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "钢铁",
-        "x": 0.168,
+        "x": 0.17,
         "y": 0.41,
         "value": -2.6,
         "color": "blue",
@@ -286,7 +286,7 @@ window.SECTOR_DB = {
       },
       {
         "name": "综合",
-        "x": 0.133,
+        "x": 0.135,
         "y": 0.305,
         "value": -0.9,
         "color": "blue",
