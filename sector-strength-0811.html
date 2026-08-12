@@ -7,7 +7,7 @@
   <meta name="description" content="2026-08-11 申万一级行业强弱分布交互图：波动性 × 强弱势级，鼠标悬停观察细节。" />
   <meta name="theme-color" content="#FFFFFF">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/interactive.css?v=6">
+  <link rel="stylesheet" href="css/interactive.css?v=7">
 </head>
 <body>
 
@@ -35,6 +35,11 @@
       <div class="interactive-wrap">
 
         <div class="controls">
+          <div class="date-seg" id="date-seg" role="group" aria-label="日期选择">
+            <button type="button" class="date-btn active" data-date="2026-08-11">08-11</button>
+            <button type="button" class="date-btn" data-date="2026-08-07">08-07</button>
+            <button type="button" class="date-btn" data-date="2026-08-05">08-05</button>
+          </div>
           <div class="dualfilter">
             <span>强弱</span>
             <div class="df-track" id="df-y" role="slider" aria-label="强弱范围筛选" aria-valuemin="0.30" aria-valuemax="0.65" aria-valuenow="0.30" aria-valuetext="0.30 到 0.65"></div>
@@ -48,12 +53,12 @@
           <div class="dualfilter">
             <span>连续性</span>
             <div class="df-track" id="df-c" role="slider" aria-label="连续性范围筛选" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" aria-valuetext="0 到 10"></div>
-            <span class="df-values" id="df-c-values">0 – 10</span>
+            <span class="df-values" id="df-c-values">0.0 – 10.0</span>
           </div>
           <div class="dualfilter">
             <span>甜品度</span>
-            <div class="df-track" id="df-v" role="slider" aria-label="甜品度范围筛选" aria-valuemin="-2.50" aria-valuemax="2.50" aria-valuenow="-2.50" aria-valuetext="-2.50 到 2.50"></div>
-            <span class="df-values" id="df-v-values">-2.50 – 2.50</span>
+            <div class="df-track" id="df-v" role="slider" aria-label="甜品度范围筛选" aria-valuemin="-3.5" aria-valuemax="3.5" aria-valuenow="-3.5" aria-valuetext="-3.5 到 3.5"></div>
+            <span class="df-values" id="df-v-values">-3.50 – 3.50</span>
           </div>
           <div class="colorfilter">
             <span>颜色</span>
@@ -72,7 +77,7 @@
           <div id="tooltip" class="tooltip" role="tooltip"></div>
         </div>
 
-        <p class="caption">30 个申万一级行业 · 数字=甜品度 · 圆大小=连续性(0-10) · 五个筛选：强弱 × 波动性 × 连续性 × 甜品度 × 颜色</p>
+        <p class="caption">30 个申万一级行业 · 数字=甜品度 · 圆大小=连续性(0-10) · 切换日期查看不同交易日截面</p>
       </div>
 
     </article>
@@ -85,6 +90,6 @@
     </div>
   </footer>
 
-  <script src="js/sector-strength.js?v=6"></script>
+  <script src="js/sector-strength.js?v=7"></script>
 </body>
 </html>

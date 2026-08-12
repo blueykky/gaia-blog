@@ -123,6 +123,41 @@
   color: var(--ink-soft);
 }
 
+/* ---- 日期切换按钮组 ---- */
+.date-seg {
+  display: flex;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.date-btn {
+  appearance: none;
+  background: #FFFFFF;
+  border: none;
+  padding: 5px 14px;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background .18s ease, color .18s ease;
+  -webkit-tap-highlight-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+.date-btn + .date-btn {
+  border-left: 1px solid var(--hairline);
+}
+
+.date-btn:hover {
+  color: var(--ink);
+}
+
+.date-btn.active {
+  background: var(--ink);
+  color: #FFFFFF;
+}
+
 .color-seg {
   display: flex;
   border: 1px solid var(--hairline);
