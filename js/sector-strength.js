@@ -70,18 +70,6 @@ function niceTicks(min, max, count) {
   return ticks;
 }
 
-// 圆大小：将连续性(cont)按数据库全局范围归一化后映射到 [R_MIN, R_MAX]，
-// 拉大圆大小差异（最大/最小 ≈ 4.3 倍），便于肉眼分辨
-const R_MIN = 6;
-const R_MAX = 26;
-
-function rScale(cont) {
-  const [cLo, cHi] = C_RAW;
-  const span = (cHi - cLo) || 0.1;
-  const t = Math.min(1, Math.max(0, (cont - cLo) / span));
-  return R_MIN + t * (R_MAX - R_MIN);
-}
-
 // ---------- 构建 sectors（直接取数据库中该日期的数组，每条数据带完整坐标） ----------
 function buildSectors(date, db) {
   return db.dates[date] || [];
@@ -104,6 +92,18 @@ const Y_RANGE = ranges.Y;
 const V_RANGE = ranges.V;
 const C_RANGE = ranges.C;
 const C_RAW = ranges.C_RAW;
+
+// 圆大小：将连续性(cont)按数据库全局范围归一化后映射到 [R_MIN, R_MAX]，
+// 拉大圆大小差异（最大/最小 ≈ 4.3 倍），便于肉眼分辨
+const R_MIN = 6;
+const R_MAX = 26;
+
+function rScale(cont) {
+  const [cLo, cHi] = C_RAW;
+  const span = (cHi - cLo) || 0.1;
+  const t = Math.min(1, Math.max(0, (cont - cLo) / span));
+  return R_MIN + t * (R_MAX - R_MIN);
+}
 
 const xScale = (x) => {
   const innerW = VIEW.w - VIEW.pad.left - VIEW.pad.right;
