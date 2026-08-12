@@ -35,14 +35,18 @@
       <div class="interactive-wrap">
 
         <div class="controls">
-          <button id="btn-scatter" class="ctrl-btn active" type="button">散点图</button>
-          <button id="btn-bar" class="ctrl-btn" type="button">按涨跌排序</button>
           <label class="ctrl-range">
             <span>强弱过滤</span>
-            <input type="range" id="strength-filter" min="0.30" max="0.65" step="0.01" value="0.30">
-            <span id="strength-value">≥ 0.30</span>
+            <input type="range" id="filter-y" min="0.30" max="0.65" step="0.01" value="0.30">
+            <span id="filter-y-value">≥ 0.30</span>
+          </label>
+          <label class="ctrl-range">
+            <span>波动性过滤</span>
+            <input type="range" id="filter-x" min="0.08" max="0.28" step="0.01" value="0.08">
+            <span id="filter-x-value">≥ 0.08</span>
           </label>
           <button id="btn-replay" class="ctrl-btn" type="button">▶ 重播动画</button>
+          <span id="dot-count" class="count-tag"></span>
         </div>
 
         <div class="chart-area">
@@ -50,7 +54,7 @@
           <div id="tooltip" class="tooltip" role="tooltip"></div>
         </div>
 
-        <p class="caption">30 个申万一级行业 · 圆点大小代表涨跌幅绝对值 · 蓝/红色按图还原</p>
+        <p class="caption">30 个申万一级行业 · 圆点大小代表涨跌幅绝对值 · 双滑块筛选：强弱 × 波动性</p>
       </div>
 
     </article>

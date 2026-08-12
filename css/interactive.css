@@ -72,6 +72,13 @@
   color: var(--ink);
 }
 
+.count-tag {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--ink-faint);
+  font-variant-numeric: tabular-nums;
+}
+
 /* ---- 图表区 ---- */
 .chart-area {
   position: relative;
@@ -148,18 +155,6 @@
 
 .dot.hidden {
   display: none;
-}
-
-/* 入场动画初始态 */
-.dot.enter circle {
-  transform: scale(0);
-  transform-origin: center;
-  transform-box: fill-box;
-  opacity: 0;
-}
-
-.dot.enter .dot-label {
-  opacity: 0;
 }
 
 /* ---- tooltip ---- */

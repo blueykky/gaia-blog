@@ -1,6 +1,7 @@
 /* ============================================================
-   行业强弱分布 — 交互逻辑
+   行业强弱分布 — 交互逻辑（v2）
    30 个申万一级行业（2026-08-11）
+   散点图：波动性 x × 强弱势级 y；强弱/波动性双过滤；标签防重叠
    ============================================================ */
 
 const SECTORS = [
@@ -44,17 +45,14 @@ const Y_RANGE = [0.30, 0.65];
 
 const COLOR = {
   blue: "#7B92B5",
-  red:  "#DC5F5F",
-  blueHover: "#5A77A0",
-  redHover: "#B24545"
+  red:  "#DC5F5F"
 };
 
 // 状态
 let state = {
-  view: "scatter",  // scatter | bar
-  filter: 0.30,     // y 阈值
-  current: null,    // hover/active 点
-  enterPlayed: false
+  filterY: 0.30,   // 强弱过滤阈值（y）
+  filterX: 0.08,   // 波动性过滤阈值（x）
+  current: null
 };
 
 // 比例尺
@@ -68,27 +66,11 @@ const yScale = (y) => {
 };
 const rScale = (v) => 8 + Math.min(Math.abs(v), 3) * 4.5;
 
-// 排序柱状模式：x 改为按 value 排序
-let barLayout = null;
-function computeBarLayout() {
-  const sorted = [...SECTORS].sort((a, b) => b.value - a.value);
-  const innerW = VIEW.w - VIEW.pad.left - VIEW.pad.right;
-  const innerH = VIEW.h - VIEW.pad.top - VIEW.pad.bottom;
-  const barW = innerW / sorted.length * 0.7;
-  const gap = innerW / sorted.length * 0.3;
-  barLayout = sorted.map((d, i) => ({
-    ...d,
-    bx: VIEW.pad.left + i * (barW + gap) + gap / 2,
-    by: VIEW.pad.top + innerH,
-    bw: barW,
-    bh: Math.abs(d.value) / 3.5 * innerH * 0.85,
-    up: d.value >= 0
-  }));
-}
-
-// 渲染
+// 渲染容器
 const svg = document.getElementById("chart");
 const tooltip = document.getElementById("tooltip");
+const countEl = document.getElementById("dot-count");
+let dots = [];
 
 function svgEl(name, attrs, parent) {
   const el = document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -100,18 +82,19 @@ function svgEl(name, attrs, parent) {
   return el;
 }
 
+// ---------- 坐标轴 ----------
 function renderAxes() {
   const innerW = VIEW.w - VIEW.pad.left - VIEW.pad.right;
   const innerH = VIEW.h - VIEW.pad.top - VIEW.pad.bottom;
 
-  // 横向虚线 y=0.50
+  // 横向虚线 y=0.50（强弱分界）
   const yMid = yScale(0.50);
   svgEl("line", {
     x1: VIEW.pad.left, y1: yMid, x2: VIEW.pad.left + innerW, y2: yMid,
     class: "axis-line"
   }, svg);
 
-  // 纵向虚线 x=0.21
+  // 纵向虚线 x=0.21（波动性参考）
   const xMid = xScale(0.21);
   svgEl("line", {
     x1: xMid, y1: VIEW.pad.top, x2: xMid, y2: VIEW.pad.top + innerH,
@@ -139,13 +122,11 @@ function renderAxes() {
     x: VIEW.pad.left + innerW / 2, y: VIEW.h - 18,
     "text-anchor": "middle", class: "axis-title", text: "波动性"
   }, svg);
-
-  const yTitle = svgEl("text", {
-    x: 0, y: 0, class: "axis-title",
-    transform: `translate(18, ${VIEW.pad.top + innerH / 2}) rotate(-90)`,
-    "text-anchor": "middle", text: "强弱势级"
+  svgEl("text", {
+    x: 18, y: VIEW.pad.top + innerH / 2,
+    transform: "rotate(-90 18 " + (VIEW.pad.top + innerH / 2) + ")",
+    "text-anchor": "middle", class: "axis-title", text: "强弱势级"
   }, svg);
-  yTitle.setAttribute("text-anchor", "middle");
 
   // 日期标签
   svgEl("text", {
@@ -154,200 +135,139 @@ function renderAxes() {
   }, svg);
 }
 
+// ---------- 圆点 ----------
 function renderDots() {
-  const g = svgEl("g", { id: "dots-group" }, svg);
-  SECTORS.forEach((d, i) => {
-    const dot = svgEl("g", { class: "dot enter", "data-name": d.name }, g);
-
+  SECTORS.forEach((d) => {
     const cx = xScale(d.x);
     const cy = yScale(d.y);
     const r = rScale(d.value);
 
-    const c = svgEl("circle", {
+    const g = svgEl("g", { class: "dot", "data-name": d.name }, svg);
+
+    const circle = svgEl("circle", {
       cx, cy, r,
       fill: d.color === "blue" ? COLOR.blue : COLOR.red,
       "fill-opacity": "0.72",
       stroke: "rgba(255,255,255,0.6)",
       "stroke-width": "0.8"
-    }, dot);
+    }, g);
 
     const label = svgEl("text", {
       x: cx + r + 4, y: cy + 4,
-      class: "dot-label", text: `${d.name} ${d.value.toFixed(2)}`
-    }, dot);
+      class: "dot-label", text: d.name + " " + d.value.toFixed(2)
+    }, g);
 
-    dot.addEventListener("mouseenter", (e) => onHover(d, dot, e));
-    dot.addEventListener("mousemove", (e) => moveTooltip(e));
-    dot.addEventListener("mouseleave", () => onLeave(d, dot));
-    dot.addEventListener("click", () => onClick(d, dot));
+    g.addEventListener("mouseenter", (e) => onHover(d, g, e));
+    g.addEventListener("mousemove", (e) => moveTooltip(e));
+    g.addEventListener("mouseleave", () => onLeave(d, g));
+    g.addEventListener("click", () => onClick(d, g));
+
+    dots.push({ d, g, circle, label, cx, cy, r });
   });
 }
 
-function renderBars() {
-  const g = svgEl("g", { id: "bars-group" }, svg);
-  const innerH = VIEW.h - VIEW.pad.top - VIEW.pad.bottom;
-  barLayout.forEach((d) => {
-    const top = d.up ? d.by - d.bh : d.by;
-    const bar = svgEl("rect", {
-      x: d.bx, y: top, width: d.bw, height: d.bh,
-      fill: d.color === "blue" ? COLOR.blue : COLOR.red,
-      "fill-opacity": "0.78",
-      rx: 2,
-      class: "dot enter",
-      "data-name": d.name
-    }, g);
+// ---------- 标签防重叠（贪心：按 y 降序逐个放置，垂直错开） ----------
+function avoidOverlap() {
+  const order = [...dots].sort((a, b) => b.cy - a.cy || a.cx - b.cx);
+  const placed = [];
 
-    const labelY = d.up ? top - 6 : d.by + 16;
-    svgEl("text", {
-      x: d.bx + d.bw / 2, y: labelY,
-      "text-anchor": "middle", class: "dot-label",
-      text: `${d.name} ${d.value.toFixed(2)}`
-    }, g);
-
-    bar.addEventListener("mouseenter", (e) => onHover(d, bar, e));
-    bar.addEventListener("mousemove", (e) => moveTooltip(e));
-    bar.addEventListener("mouseleave", () => onLeave(d, bar));
-    bar.addEventListener("click", () => onClick(d, bar));
-  });
-
-  // 0 基准线
-  svgEl("line", {
-    x1: VIEW.pad.left, y1: yScale(0.50),
-    x2: VIEW.w - VIEW.pad.right, y2: yScale(0.50),
-    class: "axis-line"
-  }, g);
-}
-
-function clearChart() {
-  // 保留 axes 和 date tag，只清点
-  const d1 = svg.querySelector("#dots-group");
-  if (d1) d1.remove();
-  const d2 = svg.querySelector("#bars-group");
-  if (d2) d2.remove();
-  tooltip.classList.remove("show");
-  state.current = null;
-}
-
-function render() {
-  clearChart();
-  renderAxes();
-  if (state.view === "scatter") {
-    renderDots();
-  } else {
-    computeBarLayout();
-    renderBars();
+  function overlap(a, b) {
+    return a.x < b.x + b.w && a.x + a.w > b.x &&
+           a.y < b.y + b.h && a.y + a.h > b.y;
   }
-  if (state.enterPlayed) playEnter();
-  applyFilter();
-}
 
-// 入场动画：点从中心放大出现
-function playEnter() {
-  const dots = svg.querySelectorAll(".dot.enter");
-  const cx0 = VIEW.w / 2;
-  const cy0 = VIEW.h / 2;
-  dots.forEach((d, i) => {
-    const c = d.querySelector("circle, rect");
-    if (!c) return;
-    // 记录目标位置
-    let tx = 0, ty = 0;
-    if (c.tagName === "circle") {
-      tx = parseFloat(c.getAttribute("cx")) - cx0;
-      ty = parseFloat(c.getAttribute("cy")) - cy0;
-    }
-    // 初始位移
-    c.style.transition = "none";
-    c.style.transformOrigin = "center";
-    if (c.tagName === "circle") {
-      c.setAttribute("cx", cx0);
-      c.setAttribute("cy", cy0);
-    } else {
-      c.setAttribute("x", cx0);
-      c.setAttribute("y", cy0);
-      c.setAttribute("width", 0);
-      c.setAttribute("height", 0);
-    }
-    c.style.opacity = "0";
-    // 强制 reflow
-    void c.getBoundingClientRect();
-    // 过渡到目标
-    setTimeout(() => {
-      c.style.transition = "all .65s cubic-bezier(.22,.9,.3,1.2)";
-      if (c.tagName === "circle") {
-        c.setAttribute("cx", cx0 + tx);
-        c.setAttribute("cy", cy0 + ty);
-      } else {
-        const d = barLayout.find(b => b.name === d.dataset.name);
-        c.setAttribute("x", d.bx);
-        c.setAttribute("y", d.up ? d.by - d.bh : d.by);
-        c.setAttribute("width", d.bw);
-        c.setAttribute("height", d.bh);
+  for (const item of order) {
+    const lab = item.label;
+    let lx = item.cx + item.r + 4;
+    const bb = lab.getBBox();
+    const bw = bb.width, bh = bb.height;
+    const rightEdge = VIEW.w - VIEW.pad.right;
+    if (lx + bw > rightEdge) lx = item.cx - item.r - 4 - bw; // 太靠右则放左边
+    const baseY = item.cy - bh / 2;
+
+    let found = null;
+    outer:
+    for (let step = 0; step <= 16; step++) {
+      for (const dir of [1, -1]) {
+        const dy = step * 13 * dir;
+        const rect = { x: lx, y: baseY + dy, w: bw, h: bh };
+        if (!placed.some(p => overlap(rect, p))) { found = rect; break outer; }
       }
-      c.style.opacity = "0.78";
-    }, 30 + i * 25);
-  });
+    }
 
-  // 文字淡入
-  setTimeout(() => {
-    svg.querySelectorAll(".dot-label").forEach((lab, i) => {
-      lab.style.transition = "opacity .3s ease";
-      lab.style.opacity = "0.75";
-    });
-  }, 600);
-}
-
-// 强弱过滤
-function applyFilter() {
-  const minY = state.filter;
-  if (state.view === "scatter") {
-    SECTORS.forEach(d => {
-      const el = svg.querySelector(`.dot[data-name="${d.name}"]`);
-      if (!el) return;
-      if (d.y < minY) el.classList.add("faded");
-      else el.classList.remove("faded");
-    });
-  } else {
-    barLayout.forEach(d => {
-      const el = svg.querySelector(`.dot[data-name="${d.name}"]`);
-      if (!el) return;
-      if (d.y < minY) el.classList.add("faded");
-      else el.classList.remove("faded");
-    });
+    if (found) {
+      lab.setAttribute("x", found.x);
+      lab.setAttribute("y", found.y + bh / 2);
+      placed.push(found);
+    } else {
+      placed.push({ x: lx, y: baseY, w: bw, h: bh });
+    }
   }
 }
 
-// hover / tooltip
+// ---------- 过滤（强弱 y + 波动性 x 双条件） ----------
+function applyFilter() {
+  let visible = 0;
+  dots.forEach(item => {
+    const show = item.d.y >= state.filterY && item.d.x >= state.filterX;
+    item.g.classList.toggle("faded", !show);
+    if (show) visible++;
+  });
+  countEl.textContent = "显示 " + visible + " / " + SECTORS.length + " 个行业";
+}
+
+// ---------- 入场动画：从中心散开 ----------
+function playEnter() {
+  const cx0 = VIEW.w / 2, cy0 = VIEW.h / 2;
+  dots.forEach((item, i) => {
+    const c = item.circle;
+    c.style.transition = "none";
+    c.setAttribute("cx", cx0);
+    c.setAttribute("cy", cy0);
+    c.style.opacity = "0";
+    void c.getBoundingClientRect();
+    setTimeout(() => {
+      c.style.transition = "cx .65s cubic-bezier(.22,.9,.3,1.2), cy .65s cubic-bezier(.22,.9,.3,1.2), opacity .3s ease";
+      c.setAttribute("cx", item.cx);
+      c.setAttribute("cy", item.cy);
+      c.style.opacity = "0.72";
+    }, 30 + i * 22);
+
+    const lab = item.label;
+    lab.style.transition = "opacity .3s ease";
+    lab.style.opacity = "0";
+    setTimeout(() => { lab.style.opacity = "0.75"; }, 500 + i * 22);
+  });
+}
+
+// ---------- hover / tooltip ----------
 function onHover(d, el, e) {
-  applyFilter();
-  // 高亮其他
-  svg.querySelectorAll(".dot").forEach(o => {
-    if (o !== el) o.classList.add("faded");
+  dots.forEach(o => {
+    if (o.g !== el) o.g.classList.add("faded");
   });
   el.classList.add("active");
   el.classList.remove("faded");
   state.current = d;
 
   const up = d.value >= 0;
-  tooltip.innerHTML = `
-    <div class="tt-name">${d.name}</div>
-    <div class="tt-row"><span>波动性</span><b>${d.x.toFixed(3)}</b></div>
-    <div class="tt-row"><span>强弱势级</span><b>${d.y.toFixed(3)}</b></div>
-    <div class="tt-row"><span>涨跌幅</span><b class="${up ? 'tt-up' : 'tt-down'}">${up ? '+' : ''}${d.value.toFixed(2)}%</b></div>
-  `;
+  tooltip.innerHTML =
+    '<div class="tt-name">' + d.name + '</div>' +
+    '<div class="tt-row"><span>波动性</span><b>' + d.x.toFixed(3) + '</b></div>' +
+    '<div class="tt-row"><span>强弱势级</span><b>' + d.y.toFixed(3) + '</b></div>' +
+    '<div class="tt-row"><span>涨跌幅</span><b class="' + (up ? 'tt-up' : 'tt-down') + '">' + (up ? '+' : '') + d.value.toFixed(2) + '%</b></div>';
   tooltip.classList.add("show");
   moveTooltip(e);
 }
 
 function onLeave(d, el) {
   el.classList.remove("active");
-  svg.querySelectorAll(".dot").forEach(o => o.classList.remove("faded"));
+  dots.forEach(o => o.g.classList.remove("faded"));
   applyFilter();
   tooltip.classList.remove("show");
   state.current = null;
 }
 
 function onClick(d, el) {
-  // 切换 active
   if (el.classList.contains("active")) {
     onLeave(d, el);
   } else {
@@ -357,63 +277,33 @@ function onClick(d, el) {
 
 function moveTooltip(e) {
   const area = document.querySelector(".chart-area").getBoundingClientRect();
-  const x = e.clientX - area.left;
-  const y = e.clientY - area.top;
-  tooltip.style.left = x + "px";
-  tooltip.style.top = y + "px";
+  tooltip.style.left = (e.clientX - area.left) + "px";
+  tooltip.style.top = (e.clientY - area.top) + "px";
 }
 
-// 视图切换
-const btnScatter = document.getElementById("btn-scatter");
-const btnBar = document.getElementById("btn-bar");
-btnScatter.addEventListener("click", () => {
-  state.view = "scatter";
-  btnScatter.classList.add("active");
-  btnBar.classList.remove("active");
-  render();
-});
-btnBar.addEventListener("click", () => {
-  state.view = "bar";
-  btnBar.classList.add("active");
-  btnScatter.classList.remove("active");
-  render();
-});
+// ---------- 控件 ----------
+const rangeY = document.getElementById("filter-y");
+const rangeYValue = document.getElementById("filter-y-value");
+const rangeX = document.getElementById("filter-x");
+const rangeXValue = document.getElementById("filter-x-value");
 
-// 强弱过滤
-const range = document.getElementById("strength-filter");
-const rangeValue = document.getElementById("strength-value");
-range.addEventListener("input", () => {
-  state.filter = parseFloat(range.value);
-  rangeValue.textContent = `≥ ${state.filter.toFixed(2)}`;
+rangeY.addEventListener("input", () => {
+  state.filterY = parseFloat(rangeY.value);
+  rangeYValue.textContent = "≥ " + state.filterY.toFixed(2);
+  applyFilter();
+});
+rangeX.addEventListener("input", () => {
+  state.filterX = parseFloat(rangeX.value);
+  rangeXValue.textContent = "≥ " + rangeX.value.toFixed(2);
   applyFilter();
 });
 
-// 重播
 const btnReplay = document.getElementById("btn-replay");
-btnReplay.addEventListener("click", () => {
-  // 重新触发入场动画
-  const dots = svg.querySelectorAll(".dot");
-  dots.forEach(d => {
-    const c = d.querySelector("circle, rect");
-    if (!c) return;
-    c.style.transition = "none";
-    if (c.tagName === "circle") {
-      c.setAttribute("cx", VIEW.w / 2);
-      c.setAttribute("cy", VIEW.h / 2);
-    } else {
-      c.setAttribute("x", VIEW.w / 2);
-      c.setAttribute("y", VIEW.h / 2);
-      c.setAttribute("width", 0);
-      c.setAttribute("height", 0);
-    }
-    c.style.opacity = "0";
-  });
-  svg.querySelectorAll(".dot-label").forEach(lab => lab.style.opacity = "0");
-  void svg.getBoundingClientRect();
-  setTimeout(playEnter, 50);
-});
+btnReplay.addEventListener("click", playEnter);
 
-// 启动
-render();
-state.enterPlayed = true;
+// ---------- 启动 ----------
+renderAxes();
+renderDots();
+avoidOverlap();
+applyFilter();
 setTimeout(playEnter, 100);
