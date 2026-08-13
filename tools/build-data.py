@@ -41,6 +41,9 @@ def main():
             for k in ("x", "y", "value", "color", "cont"):
                 if k not in s:
                     errors.append(f"{date} {s.get('name', '?')} 缺 {k}")
+            # 颜色必须是英文 red/blue（防 Excel 中文"红/蓝"漏转译导致全红）
+            if s.get("color") not in ("red", "blue"):
+                errors.append(f"{date} {s.get('name', '?')} 颜色非法: {s.get('color')!r}（必须 red/blue）")
 
     if errors:
         print("!! 数据完整性校验失败（未生成 js/sector-data.js）:")
