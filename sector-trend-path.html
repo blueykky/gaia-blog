@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>行业趋势路径 · Carrycore</title>
+  <meta name="description" content="行业趋势路径：多选行业在两个时间的强弱分布轨迹对比，带方向箭头。" />
+  <meta name="theme-color" content="#FFFFFF">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/interactive.css?v=21">
+  <link rel="stylesheet" href="css/trend.css?v=1">
+</head>
+<body>
+
+  <header class="site-nav">
+    <div class="nav-inner">
+      <a class="brand" href="index.html">Carrycore<em>· 金融视觉志</em></a>
+      <nav class="nav-links" aria-label="主导航">
+        <a href="index.html">首页</a>
+        <a href="sector-strength-0811.html">交互</a>
+        <a href="sector-trend-path.html" aria-current="page">趋势路径</a>
+        <a href="about.html">关于</a>
+        <a href="archive.html">归档</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <article class="post">
+
+      <header class="post-head">
+        <h1>行业趋势路径</h1>
+        <time id="trend-subtitle">对照 → 基准</time>
+        <p class="post-sub">选择行业与两个时间，观察行业在坐标系中的移动轨迹</p>
+      </header>
+
+      <div class="interactive-wrap">
+
+        <div class="controls trend-controls">
+          <div class="trend-dates">
+            <div class="datepicker-wrap" id="dp-base-wrap">
+              <button type="button" class="date-picker-btn" id="dp-base-btn" aria-haspopup="dialog">
+                <span class="dp-tag">基准</span><span id="dp-base-label">–</span><span class="dp-caret">▾</span>
+              </button>
+            </div>
+            <div class="datepicker-wrap" id="dp-ref-wrap">
+              <button type="button" class="date-picker-btn" id="dp-ref-btn" aria-haspopup="dialog">
+                <span class="dp-tag dp-tag-ref">对照</span><span id="dp-ref-label">–</span><span class="dp-caret">▾</span>
+              </button>
+            </div>
+            <div class="datepicker-pop" id="datepicker-pop" role="dialog" aria-label="选择日期" hidden></div>
+          </div>
+          <div class="sector-pick">
+            <div class="sp-head">
+              <span>行业多选</span>
+              <button type="button" class="sp-btn" id="sp-all">全选</button>
+              <button type="button" class="sp-btn" id="sp-none">清空</button>
+              <span id="sp-count" class="count-tag"></span>
+            </div>
+            <div class="sp-list" id="sp-list"></div>
+          </div>
+          <div class="dualfilter">
+            <span>强弱</span>
+            <div class="df-track" id="df-y"></div>
+            <span class="df-values" id="df-y-values">–</span>
+          </div>
+          <div class="dualfilter">
+            <span>波动性</span>
+            <div class="df-track" id="df-x"></div>
+            <span class="df-values" id="df-x-values">–</span>
+          </div>
+          <div class="dualfilter">
+            <span>连续性</span>
+            <div class="df-track" id="df-c"></div>
+            <span class="df-values" id="df-c-values">–</span>
+          </div>
+          <div class="dualfilter">
+            <span>甜品度</span>
+            <div class="df-track" id="df-v"></div>
+            <span class="df-values" id="df-v-values">–</span>
+          </div>
+          <div class="colorfilter">
+            <span>基准颜色</span>
+            <div class="color-seg" id="color-seg" role="group" aria-label="基准颜色筛选">
+              <button type="button" class="seg-btn active" data-color="all">全部</button>
+              <button type="button" class="seg-btn" data-color="blue">蓝</button>
+              <button type="button" class="seg-btn" data-color="red">红</button>
+            </div>
+          </div>
+          <button id="btn-replay" class="ctrl-btn" type="button">▶ 重播动画</button>
+          <span id="dot-count" class="count-tag"></span>
+        </div>
+
+        <div class="chart-area">
+          <svg id="chart" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" aria-label="行业趋势路径图"></svg>
+          <div id="tooltip" class="tooltip" role="tooltip"></div>
+        </div>
+
+        <p class="caption">圆点=各行业在基准/对照时间的强弱位置 · 基准有颜色、对照为灰色 · 虚线箭头指向行业移动方向 · 数据来自用户提供的精确底层数据</p>
+      </div>
+
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <small>© 2026 Carrycore · 用图片说话，用留白呼吸</small>
+      <a href="index.html">返回首页</a>
+    </div>
+  </footer>
+
+  <script src="js/sector-data-0813e.js?v=21"></script>
+  <script src="js/sector-trend-path.js?v=1"></script>
+</body>
+</html>
