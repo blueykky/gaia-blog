@@ -121,6 +121,12 @@
   fill: none;
 }
 
+/* 滑块筛选淡出：趋势页组是 .sector-group（原 .dot.faded 不适用） */
+.sector-group.faded {
+  opacity: 0.15;
+  pointer-events: none;
+}
+
 /* 对照点（灰色） */
 .ref-dot circle {
   fill: #A6A6A6;

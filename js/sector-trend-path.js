@@ -445,6 +445,9 @@ function buildYearsView(y) {
 
 function openCalendar(target) {
   pickTarget = target;
+  // 把弹窗挂到当前按钮所属的 wrap 下，保证绝对定位相对按钮正确（两个日期按钮共用弹窗）
+  const wrap = $(target === "base" ? "dp-base-wrap" : "dp-ref-wrap");
+  if (wrap && dpPop.parentNode !== wrap) wrap.appendChild(dpPop);
   const cur = target === "base" ? baseDate : refDate;
   const parts = cur.split("-");
   buildCalendar(parseInt(parts[0], 10), parseInt(parts[1], 10), "days");
