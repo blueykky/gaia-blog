@@ -577,6 +577,10 @@ if (dpBtn && dpPop) {
 
   // 日历内部交互（事件委托）
   dpPop.addEventListener("click", (e) => {
+    // 关键：阻止冒泡。否则 buildCalendar 重绘 DOM 后，e.target 变成已移除的旧节点，
+    // document 的"点击外部关闭"监听会误判为点击了外部而关闭日历（翻月/切视图即消失）。
+    e.stopPropagation();
+
     // 月份/年份快选（months 视图点击月份 → 切 days 视图）
     const month = e.target.closest("[data-nav='pick-d']");
     if (month) {
