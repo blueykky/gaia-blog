@@ -28,7 +28,7 @@
       <div class="container">
         <h1>市场很吵<br>看图就够了</h1>
         <p>用图表讲述关于投资的故事</p>
-        <p class="hero-mini"><a href="sector-strength-0811.html">→ 行业强弱分布交互图（2026.08.11）</a></p>
+        <p class="hero-mini"><a href="sector-strength-0811.html" id="sector-entry">→ 行业强弱分布交互图</a></p>
       </div>
     </section>
 
@@ -108,6 +108,20 @@
       <a href="archive.html">全部文章 →</a>
     </div>
   </footer>
+
+  <!-- 交互图数据（供首页入口动态显示最新日期；文件名随数据库更新而变更） -->
+  <script src="js/sector-data-0813b.js?v=21"></script>
+  <script>
+    (function () {
+      var el = document.getElementById("sector-entry");
+      if (el && window.SECTOR_DB && window.SECTOR_DB.dates) {
+        var dates = Object.keys(window.SECTOR_DB.dates).sort().reverse();
+        if (dates.length) {
+          el.textContent = "→ 行业强弱分布交互图（" + dates[0].replace(/-/g, ".") + "）";
+        }
+      }
+    })();
+  </script>
 
 </body>
 </html>
